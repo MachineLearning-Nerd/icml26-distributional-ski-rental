@@ -1,8 +1,8 @@
 {
   "bundle": {
-    "bytes": 5386,
+    "bytes": 5387,
     "records": 12,
-    "sha256": "dfa20b689df25b4cf5158b982bc0dddbe0164ca94f111618abae2f5aa83664d9"
+    "sha256": "ab5e92785ebf64ef7791c2ec58e11e76985c0d3f014264bb77d16d28cab004be"
   },
   "maximum_points": 6,
   "official_claim_count": 3,

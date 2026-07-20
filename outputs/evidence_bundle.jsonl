@@ -1,5 +1,5 @@
 {"bytes": 668, "path": "README.md", "sha256": "18612860a4eee2522f04f41df59c911890509d6d1c065756fd73d716add1579e"}
-{"bytes": 590, "path": "STATUS.md", "sha256": "5de3fd586aa66232e7ed6396eed2bb48cbd4d79dd25c17e7cd1f19f7d41fdbee"}
+{"bytes": 1078, "path": "STATUS.md", "sha256": "864b52f0286ba0ec8d332675f9d8d7f6768a8a1465a193bc9f0c9a3033cbc92e"}
 {"bytes": 627, "path": "sources.json", "payload": {"anchors": {"base_algorithm_with_proof.tex": "5a084a4919de80641caf48268e18f6d2a2cc78c2f7ff9742ad2ebdcd1f458a73", "consistency_robustness.tex": "4df60b9cecc995fc2d639f914809c31bd0b44146300ef1a9551632162ab1822f", "main_algorithm.tex": "47c36490f628d8028364a8bee3c80862af4ed69ad680b921ddc0f0edafaa7a54"}, "implementation": "No author code is advertised in the primary source; verifier is clean-room exact rational arithmetic.", "paper": {"arxiv_id": "2602.21104v1", "arxiv_source_sha256": "f4332df2005da57a5d0dc409e5b321813868878a04d00ad303962dd9755b6864", "openreview_id": "h8NydU966G"}}, "sha256": "ad2d84da87c1362ce5aecf89afbcbaec68b111050b316728468775ae13ea4cd8"}
 {"bytes": 14, "path": "repro/requirements.txt", "sha256": "a0e201ecda2bc871726ea3bb5db9cfe6b2109f60d8da88eecf910b790794b03d"}
 {"bytes": 9428, "path": "repro/src/verify_ski_rental.py", "sha256": "e8d42f1862c1e46f0f5972f5d14ce6f8f0322c130fbf084e9c16662ac99bb6a6"}
