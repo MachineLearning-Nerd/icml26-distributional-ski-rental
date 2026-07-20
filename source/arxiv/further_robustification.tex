@@ -1,0 +1,175 @@
+\section{Further robustification}
+\label{sec:further robustification}
+
+
+When $EMD(\hat p,p)$ is large (larger than $\sqrt{b} \log b$), Algorithm~\ref{alg:new algorithm} could incur a $\Theta(b \log b)$ cost, which is a robustness guarantee by the algorithm itself for free. However, it is still desirable to explicitly interpolate between this algorithm and the classical worst-case strategy to achieve a stronger robustness guarantee. In this section, we present a further robustification of Algorithm~\ref{alg:new algorithm} that preserves benefits of the prediction and the free robustness while providing additional explicit worst-case control.
+
+Recall that the classical worst-case algorithm for the ski rental problem buys skis at the beginning of day $b$, achieving the optimal competitive ratio of $2$ and additive loss of $b$~\cite{Karlin1986CompetitiveSC}. A natural idea to robustify our algorithm is to ``push'' our algorithm closer to the traditional worst-case algorithm, making them as similar as possible. To do this, we introduce a hyperparameter $\lambda\in[0,1]$ that controls the degree of robustification. Algorithm~\ref{alg:new lambda-robustification} is a robustification of Algorithm~\ref{alg:new algorithm} that uses $\lambda$ to decide how much to ``push'' Algorithm~\ref{alg:new algorithm} towards the worst-case algorithm. As before, we assume without loss of generality that $\sqrt b$ is an integer; otherwise, we use $\lfloor\sqrt b\rfloor$ instead.
+
+
+\begin{algorithm}
+\caption{Further robustification of Algorithm~\ref{alg:new algorithm}}
+\label{alg:new lambda-robustification}
+\begin{algorithmic}[1]
+
+\STATE Compute the optimal policy $A_{\hat{K}}$ for the prediction $\hat{p}$.
+\STATE Compute $U$ such that $\sum_{t>U} \hat{p}_t \le \frac{1}{\sqrt{b}}$.
+\STATE Set $K^* = \min(\hat{K} + \sqrt{b},\, U + \sqrt{b})$.
+
+\IF{$K^* \le b$}
+    \IF{$K^* < \lceil \lambda b \rceil$}
+        \STATE Buy at the beginning of day $\lceil \lambda b \rceil$.
+    \ELSE
+        \STATE Buy at the beginning of day $K^* + 1$.
+    \ENDIF
+\ELSE
+    \IF{$K^* \ge \lceil b/\lambda \rceil$}
+        \STATE Buy at the beginning of day $\lceil b/\lambda \rceil$.
+    \ELSE
+        \STATE Buy at the beginning of day $K^* + 1$.
+    \ENDIF
+\ENDIF
+
+\end{algorithmic}
+\end{algorithm}
+
+
+
+We have the following theorem.
+
+
+
+\newrobust*
+
+
+\begin{proof}[Proof of Theorem~\ref{thm: new robustification}]
+
+If $\lambda=0$, we run Algorithm~\ref{alg:new algorithm} so that the first term obviously holds. The second term goes to $\infty$, thus Algorithm~\ref{alg:new algorithm} is the required algorithm. Now, let us consider the main case when $\lambda>0$ where we use Algorithm~\ref{alg:new lambda-robustification}.
+In the following analysis, we break into cases depending on the output of Algorithm~\ref{alg:new lambda-robustification}. 
+
+    \paragraph{Case 1.} If the output of Algorithm~\ref{alg:new lambda-robustification} is to buy at the beginning of day $\lceil \lambda b \rceil$. We know that in this case we have $K^* < \lceil \lambda b \rceil $. 
+
+    First, let us show the second part of the bound (which leads to the robustness), i.e., we want to show that $c((A_{\lceil \lambda b \rceil - 1})_{p}) \leq (1+\frac{1}{\lambda})c(OPT_p)$. Here $LHS = \sum _{t \leq \lceil \lambda b \rceil - 1} tp_t + \sum_{t \geq \lceil \lambda b \rceil} (\lceil \lambda b \rceil - 1 + b)p_t$.
+    
+    If $OPT_p = A_\infty$, then $RHS=(1+\frac{1}{\lambda})\sum_t tp_t$. To show that $LHS \leq RHS$, we only need to show that $\sum_{t \geq \lceil \lambda b \rceil} (\lceil \lambda b \rceil - 1 + b)p_t  \leq (1+\frac{1}{\lambda})\sum_{t \geq \lceil \lambda b \rceil} tp_t$. This holds because
+    \[\sum_{t \geq \lceil \lambda b \rceil} (\lceil \lambda b \rceil - 1 + b)p_t  \leq \sum_{t \geq \lceil \lambda b \rceil} (\lambda b + b)p_t = \frac{\lambda+1}{\lambda} \sum_{t \geq \lceil \lambda b \rceil} (\lambda b )p_t \leq (1+\frac{1}{\lambda})\sum_{t \geq \lceil \lambda b \rceil} tp_t.\]
+    If $OPT_p = A_K$, then $RHS=(1+\frac{1}{\lambda}) \left[ \sum_{t \leq K}tp_t + \sum_{t>K}(K+b)p_t \right]$. We check that the coefficient of term $p_t$ in the $LHS$ is at most that in the $RHS$ for each $t$. 
+    \begin{align*}
+    \text{If } K \leq \lceil \lambda b \rceil - 1, \text{ then } 
+    \begin{cases}
+        t \leq (1+\frac{1}{\lambda})t & \text{for } t \leq K, \\
+        t \leq K+b \leq (1+\frac{1}{\lambda})(K+b) & \text{for } K<t \leq \lceil \lambda b \rceil - 1, \\
+        \lceil \lambda b \rceil - 1 +b \leq (1+\frac{1}{\lambda}) \lceil \lambda b \rceil \leq (1+\frac{1}{\lambda})(K+b) & \text{for } t \geq \lceil \lambda b \rceil.
+    \end{cases}
+    \end{align*}
+    
+    
+    \begin{align*}
+    \text{If } \lceil \lambda b \rceil - 1 < K, \text{ then } 
+    \begin{cases}
+        t \leq (1+\frac{1}{\lambda})t & \text{for } t \leq \lceil \lambda b \rceil - 1, \\
+        \lceil \lambda b \rceil - 1 + b \leq (1+\frac{1}{\lambda}) \lceil \lambda b \rceil \leq (1+\frac{1}{\lambda}) t & \text{for } \lceil \lambda b \rceil \leq t \leq K, \\
+        \lceil \lambda b \rceil - 1 + b \leq (1+\frac{1}{\lambda}) \lceil \lambda b \rceil \leq  (1+\frac{1}{\lambda})(K+b) & \text{for } t >K.
+    \end{cases}
+    \end{align*}
+
+    Then, let us show the first part of the bound (which leads to the consistency). 
+
+    We know from Theorem~\ref{thm:new theorem} that $c((A_{K^*})_p) \leq c(OPT_p) + \min \left(O(\sqrt{b} \max(EMD(\hat{p},p),1)), O(b \log b)\right)$. Thus,  we only need to show that $c((A_{\lceil \lambda b \rceil - 1})_{p}) \leq (1+\lambda)c((A_{K^*})_p)$. That is, we want to show
+    \[\sum _{t \leq \lceil \lambda b \rceil - 1} tp_t + \sum_{t \geq \lceil \lambda b \rceil} (\lceil \lambda b \rceil - 1 + b)p_t \leq (1+\lambda)\left[ \sum_{t \leq K^*}tp_t + \sum_{t>K^*}(K^*+b)p_t \right].\]
+    Note that $K^* \leq \lceil \lambda b \rceil - 1$, the above inequality holds since
+    \begin{align*} 
+    \begin{cases}
+        t \leq (1+\lambda)t & \text{for } t \leq K^*, \\
+        t \leq  \lceil \lambda b \rceil - 1< \lambda b  \leq (1+\lambda)(K^*+b) & \text{for } K^*<t \leq \lceil \lambda b \rceil - 1, \\
+        \lceil \lambda b \rceil - 1 +b < \lambda b +b=(1+\lambda)b \leq (1+\lambda)(K^*+b) & \text{for } t \geq \lceil \lambda b \rceil.
+    \end{cases}
+    \end{align*}
+
+    \paragraph{Case 2.} If the output of Algorithm~\ref{alg:new lambda-robustification} is to buy at the beginning of day $\lceil b/\lambda \rceil$. We know that in this case we have $K^* \geq \lceil b/\lambda \rceil$. 
+
+    First, let us show the second part of the bound. We want to show that $c((A_{\lceil b/\lambda \rceil - 1})_p) \leq (1+\frac{1}{\lambda})c(OPT_p)$. Here, $LHS=\sum _{t \leq \lceil b/\lambda \rceil - 1} tp_t + \sum_{t \geq \lceil b/\lambda  \rceil} (\lceil b/\lambda  \rceil - 1 + b)p_t$.
+    
+    If $OPT_p = A_\infty$, then $RHS=(1+\frac{1}{\lambda})\sum_t tp_t$. To show that $LHS \leq RHS$, we only need to show that $\sum_{t \geq \lceil b/\lambda  \rceil} (\lceil b/\lambda  \rceil - 1 + b)p_t  \leq (1+\frac{1}{\lambda})\sum_{t \geq \lceil b/\lambda  \rceil} tp_t$. This holds because
+    \[\sum_{t \geq \lceil b/\lambda  \rceil} (\lceil b/\lambda  \rceil - 1 + b)p_t  \leq \sum_{t \geq \lceil b/\lambda \rceil} (\lceil b/\lambda  \rceil + \frac{1}{\lambda} \lceil b/\lambda  \rceil)p_t = \frac{\lambda+1}{\lambda} \sum_{t \geq \lceil b/\lambda  \rceil} \lceil b/\lambda  \rceil p_t \leq (1+\frac{1}{\lambda})\sum_{t \geq \lceil b/\lambda  \rceil} tp_t.\]
+    
+    If $OPT_p = A_K$, then $RHS=(1+\frac{1}{\lambda}) \left[ \sum_{t \leq K}tp_t + \sum_{t>K}(K+b)p_t \right]$. We check that the coefficient of term $p_t$ in the $LHS$ is at most that in the $RHS$ for each $t$. 
+    \begin{align*}
+    \text{If } K \leq \lceil b/\lambda  \rceil - 1, \text{ then } 
+    \begin{cases}
+        t \leq (1+\frac{1}{\lambda})t & \text{for } t \leq K, \\
+        t \leq \lceil b/\lambda  \rceil - 1 < b/\lambda \leq (1+\frac{1}{\lambda})(K+b) & \text{for } K<t \leq \lceil b/\lambda  \rceil - 1, \\
+        \lceil b/\lambda \rceil - 1 +b \leq b/\lambda + b \leq (1+\frac{1}{\lambda})(K+b) & \text{for } t \geq \lceil b/\lambda  \rceil.
+    \end{cases}
+    \end{align*}
+
+    
+    \begin{align*}
+    \text{If } \lceil b/\lambda  \rceil - 1 < K, \text{ then } 
+    \begin{cases}
+        t \leq (1+\frac{1}{\lambda})t & \text{for } t \leq \lceil b/\lambda \rceil - 1, \\
+        \lceil b/\lambda  \rceil - 1 + b \leq  (1+\frac{1}{\lambda})(\lceil b/\lambda  \rceil - 1) \leq (1+\frac{1}{\lambda}) t & \text{for } \lceil b/\lambda  \rceil - 1 < t \leq K, \\
+        \lceil b/\lambda  \rceil - 1 + b \leq b/\lambda + b \leq  (1+\frac{1}{\lambda})(K+b) & \text{for } t >K.
+    \end{cases}
+    \end{align*}
+
+
+    Then, let us show the first part of the bound. 
+
+    We know from Theorem~\ref{thm:new theorem} that $c((A_{K^*})_p) \leq c(OPT_p) + \min \left(O(\sqrt{b} \max(EMD(\hat{p},p),1)), O(b \log b)\right)$. Thus, we only need to show that $c((A_{\lceil b/\lambda \rceil - 1})_p) \leq (1+\lambda)c((A_{K^*})_p)$. That is, we want to show
+    \[\sum _{t \leq \lceil b/\lambda  \rceil - 1} tp_t + \sum_{t \geq \lceil b/\lambda  \rceil} (\lceil b/\lambda  \rceil - 1 + b)p_t \leq (1+\lambda)\left[ \sum_{t \leq K^*}tp_t + \sum_{t>K^*}(K^*+b)p_t \right].\]
+    Note that $\lceil b/\lambda  \rceil \leq K^* $, the above inequality holds since
+    \begin{align*} 
+    \begin{cases}
+        t \leq (1+\lambda)t & \text{for } t \leq \lceil b/\lambda  \rceil - 1, \\
+        \lceil b/\lambda  \rceil - 1 + b \leq  \lceil b/\lambda  \rceil + \lambda \lceil b/\lambda  \rceil= (1+\lambda)\lceil b/\lambda  \rceil  \leq (1+\lambda)t & \text{for } \lceil b/\lambda  \rceil \leq t \leq K^*, \\
+        \lceil b/\lambda  \rceil - 1 + b \leq (1+\lambda)\lceil b/\lambda  \rceil \leq (1+\lambda)K^* \leq (1+\lambda)(K^*+b) & \text{for } t > K^*.
+    \end{cases}
+    \end{align*}
+
+    \paragraph{Case 3.} If the output of Algorithm~\ref{alg:new lambda-robustification} is to buy at the beginning of day $K^* +1$. We know that in this case we have $\lceil \lambda b \rceil \leq K^* < \lceil b/\lambda \rceil $. 
+
+    For the first part of the bound, we know from Theorem~\ref{thm:new theorem} that $c((A_{K^*})_p) \leq c(OPT_p) + \min \left(O(\sqrt{b} \max(EMD(\hat{p},p),1)), O(b \log b)\right)$. The cost of our algorithm is exactly $c((A_{K^*})_p)$, thus it holds trivially.
+
+    For the second part of the bound, we want to show that $c((A_{K^*})_p) \leq (1+\frac{1}{\lambda})c(OPT_p)$. Here, $LHS=\sum _{t \leq K^*} tp_t + \sum_{t > K^*} (K^* + b)p_t$.
+    
+    
+    If $OPT_p = A_\infty$, then $RHS=(1+\frac{1}{\lambda})\sum_t tp_t$. To show that $LHS \leq RHS$, we only need to show that $\sum_{t > K^*} (K^* + b)p_t  \leq (1+\frac{1}{\lambda})\sum_{t > K^*} tp_t$. This holds because
+    \[\sum_{t > K^*} (K^* + b)p_t  \leq \sum_{t > K^*} (t + \frac{1}{\lambda} \lceil \lambda b \rceil)p_t \leq \sum_{t > K^*} (t + \frac{1}{\lambda} K^*)p_t \leq \sum_{t > K^*} (1+\frac{1}{\lambda}) tp_t.\]
+
+    
+    If $OPT_p = A_K$, then $RHS=(1+\frac{1}{\lambda}) \left[ \sum_{t \leq K}tp_t + \sum_{t>K}(K+b)p_t \right]$. We check that the coefficient of term $p_t$ in the $LHS$ is at most that in the $RHS$ for each $t$. 
+    \begin{align*}
+    \text{If } K \leq K^*, \text{ then } 
+    \begin{cases}
+        t \leq (1+\frac{1}{\lambda})t & \text{for } t \leq K, \\
+        t \leq K^* \leq \lceil b/\lambda \rceil - 1 < b/\lambda \leq (1+\frac{1}{\lambda})(K+b) & \text{for } K<t \leq K^*, \\
+        K^* +b < b/\lambda + b = (1+\frac{1}{\lambda})b \leq (1+\frac{1}{\lambda})(K+b) & \text{for } t > K^*.
+    \end{cases}
+    \end{align*}
+    
+    
+    \begin{align*}
+    \text{If } K^* < K, \text{ then } 
+    \begin{cases}
+        t \leq (1+\frac{1}{\lambda})t & \text{for } t \leq K^*, \\
+        K^* + b \leq t + \frac{1}{\lambda} \lceil \lambda b \rceil \leq t + \frac{1}{\lambda} K^* \leq (1+\frac{1}{\lambda} ) t & \text{for } K^* < t \leq K, \\
+        K^* +b < b/\lambda + b = (1+\frac{1}{\lambda})b \leq (1+\frac{1}{\lambda})(K+b) & \text{for } t >K.
+    \end{cases}
+    \end{align*}
+    
+    Moreover,
+    \[\sum_{t > K^*} (K^* + b)p_t  \leq \sum_{t > K^*} (t + \frac{1}{\lambda} \lceil \lambda b \rceil)p_t \leq \sum_{t > K^*} (t + \frac{1}{\lambda} K^*)p_t \leq \sum_{t > K^*} (1+\frac{1}{\lambda}) tp_t.\]
+
+    Thus, further robustness is proven as required.
+\end{proof}
+
+
+
+We get the following corollary of Theorem~\ref{thm: new robustification} by just dividing both sides by $OPT_p$; this form is directly analogous to the bounds of~\cite{kumar2024improvingonlinealgorithmsml}. 
+
+\begin{corollary}
+    \label{cor: multiplicative bounds with robust}
+    There is an algorithm $ALG$ which takes as input a parameter $\lambda \in [0,1]$ and a distributional prediction $\hat p$, and has \[\frac{c(ALG_p)}{c(OPT_p)} \leq \min \left\{ (1+\lambda)\left(1+\frac{\mathcal{B}_{\hat{p},p}}{c(OPT_p)}\right) , 1+\frac{1}{\lambda}\right\}.\]
+    where $\mathcal{B}_{\hat{p},p} = O\left( \min\left(   \sqrt{b} \max\left(EMD(\hat{p},p),1\right), \ b \log b \right)\right)$.
+\end{corollary}

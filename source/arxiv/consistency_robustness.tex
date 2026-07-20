@@ -1,0 +1,32 @@
+\section{Consistency vs. robustness tradeoff}
+\label{sec: consistency vs robustness tradeoff}
+
+In this section, we show that the robustness–consistency tradeoff achieved by our main algorithm is pareto-optimal (Theorem~\ref{thm:new lower bound}): we prove that when the prediction error is unknown, any algorithm with consistency $O(\sqrt{b})$ (the additive loss when the prediction error is $0$) must have robustness $\Omega(b \log b)$ (additive loss when the prediction error is arbitrarily large). Combined with the upper bound in Theorem~\ref{thm:new theorem}, this implies that the robustness–consistency tradeoff of Algorithm~\ref{alg:new algorithm} is tight.
+
+
+\NewLowerBound*
+\begin{proof}
+    Let $r:=1-\tfrac{2}{b}$ and choose $K:=\lceil \tfrac{1}{2} b\log b\rceil$. We first construct a prediction $\hat p$.
+    
+    We use the same notation $\hat{Q}$ to represent the tail probability mass in $\hat{p}$ as we did in Section~\ref{sec: new algorithm}. Let $\hat Q_0=1$, and for $t=0,1,\dots,K-1$, define $\hat Q_{t+1}:=r\hat Q_t$, so that $\hat Q_t=r^t$ up to time $K$. For $t\ge K$, we switch to a slower decay and define $\hat Q_{t+1}:=(1-\tfrac{1}{2b})\hat Q_t$. We then define $\hat p$ by setting $\hat p_{t+1}:=\hat Q_t-\hat Q_{t+1}$. By construction, $\sum_t \hat p_t=1$.
+    Since our setting assumes distributions with finite support $[N]$, one may replace $\hat{p}$ by a finite-support distribution obtained by aggregating all probability mass beyond $N$ and assigning it to $N$, for a sufficiently large $N$. This preserves $\sum_t \hat p_t=1$ and does not affect the analysis; for simplicity, we continue to denote the resulting distribution by $\hat{p}$.
+
+    We now compute the optimal policy for $\hat p$. Equation~\eqref{eq:triangle} implies that $c((A_{t+1})_{\hat p})-c((A_t)_{\hat p})=\hat Q_t-b\hat p_{t+1}$.
+    For $t<K$, we have $\hat Q_{t+1}=r\hat Q_t$, and hence $\hat p_{t+1}=\hat Q_t-\hat Q_{t+1}=(1-r)\hat Q_t=\tfrac{2}{b}\hat Q_t$. It follows that $c((A_{t+1})_{\hat p})-c((A_t)_{\hat p})=\hat Q_t-2\hat Q_t=-\hat Q_t<0$. Therefore, $c((A_{t+1})_{\hat p})<c((A_t)_{\hat p})$, and the cost strictly decreases up to time $K$.
+
+    For $t\ge K$, we have $\hat p_{t+1}=\tfrac{1}{2b}\hat Q_t$, which implies that $c((A_{t+1})_{\hat p})-c((A_t)_{\hat p})=\hat Q_t-\tfrac{b}{2b}\hat Q_t=\tfrac{1}{2}\hat Q_t>0$. Thus, $c((A_{t+1})_{\hat p})>c((A_t)_{\hat p})$, and the cost strictly increases for all $t\ge K$. Since the cost increases for all $t\ge K$, the limit $A_{\infty}$ is strictly worse than $A_K$ as well. Consequently, $A_K$ is the optimal policy for $\hat p$.
+
+    
+    We first prove the lower bound for deterministic algorithms, and then extend it to randomized algorithms.
+
+    Any deterministic algorithm corresponds to a policy $A_B$ for some fixed time $B\in\{0,1,2,\dots,\infty\}$. Assume that $A_B$ satisfies the consistency guarantee, i.e., assume that $c((A_B)_p)-c((A_K)_p)\leq O(\sqrt b)$ when $p = \hat p$.  We first show that this implies that $B = \Omega(b \log b)$.   
+    
+    Since $K=\Omega(b\log b)$, if $B\geq K$ then we immediately have $B=\Omega(b\log b)$. So we may assume that $B<K$.
+
+    Recall that equation~\eqref{eq:triangle} says that $c((A_B)_p)=\sum_{i=0}^{B-1}\hat Q_i+b\hat Q_B$. For $i\leq K$, we have $\hat Q_i=r^i$, and hence $c((A_B)_p)=\frac{b}{2}(1-r^B)+br^B=\frac{b}{2}+\frac{b}{2}r^B$ and $c((A_K)_p)=\frac{b}{2}+\frac{b}{2}r^K$. Therefore, the consistency guarantee implies that $\frac{b}{2}(r^B-r^K)\leq C\sqrt b$ for some constant $C$, or equivalently, $r^B\leq r^K+\frac{2C}{\sqrt b}$. Since $r^K=(1-\frac{2}{b})^K\leq e^{-2K/b}\leq e^{-\log b}=1/b\leq C/\sqrt b$ for large $b$, we obtain $r^B\leq \frac{3C}{\sqrt b}$. Using the inequality $\log(1-x)\geq -x/(1-x)$ for $0<x<1$ with $x=2/b$, we have $\log r=\log(1-\frac{2}{b})\geq -\frac{2}{b-2}$. Thus $r^B=e^{B\log r}\geq e^{-2B/(b-2)}$. Combining the above bounds yields $e^{-2B/(b-2)}\leq \frac{3C}{\sqrt b}$, which implies $\frac{2B}{b-2}\geq \frac{1}{2}\log b-\log(3C)$. Therefore, $B\geq \frac{b-2}{4}\log b-\frac{b-2}{2}\log(3C)=\Omega(b\log b)$.
+
+    So we have shown that any deterministic algorithm $A_B$ satisfying the consistency guarantee must satisfy $B=\Omega(b\log b)$. Suppose the true distribution is $p$ with $p_{b^{100}}=1$ and $p_t = 0$ for all $t \neq b^{100}$. In this case, the optimal policy is to pay $b$ to buy at the beginning, while $A_B$ will pay $\Omega(b \log b)$ to rent until time $B$.  So the additive loss is $\Omega(b\log b)$ as claimed.
+
+    A randomized algorithm can be viewed as a convex combination of deterministic algorithms. Equivalently, it samples a threshold $B$ from some distribution and then runs the policy $A_B$. Define $\Delta(B):=c((A_B)_p)-c((A_K)_p)$. Thus, a randomized algorithm satisfying the consistency guarantee must satisfy $\mathbb{E}[\Delta(B)]\leq C\sqrt b$ for some constant $C$. Note that the function $B\mapsto \Delta(B)$ is strictly decreasing on $B\leq K$ since $r^B$ is strictly decreasing. Let $B_0$ be the largest value such that $\Delta(B_0)\geq 2C\sqrt b$. Then for all $B\leq B_0$, we have $\Delta(B)\geq 2C\sqrt b$. Since $\Delta(B)\geq 0$ for all $B$, it follows that $\Pr(B\leq B_0)\cdot 2C\sqrt b\leq \mathbb{E}[\Delta(B)]\leq C\sqrt b$, and hence $\Pr(B\leq B_0)\leq \frac{1}{2}$. Therefore, $\mathbb{E}[B]\geq \Pr(B>B_0)\cdot B_0\geq \frac{1}{2}B_0$. On the other hand, since $\Delta(B_0)\geq 2C\sqrt b$ and $\Delta(B_0+1)<2C\sqrt b$, following the same reasoning as in the deterministic case implies that $r^{B_0}=\Theta(\frac{1}{\sqrt b})$. Taking logarithms yields $B_0=\Theta(b\log b)$. Consequently, $\mathbb{E}[B]\geq \Omega(b\log b)$. Finally, letting the true distribution be $p$ with $p_{b^{100}}=1$ and $p_t = 0$ for all $t \neq b^{100}$ shows that the additive loss is $\Omega(b\log b)$. This completes the proof for randomized algorithms.
+\end{proof}
+

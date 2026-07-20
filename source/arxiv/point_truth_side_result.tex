@@ -1,0 +1,201 @@
+
+\section{Distributional prediction with a point truth}
+\label{appendix:point_truth}
+
+In this section we prove the following theorem:
+
+\begin{restatable}{thm}{pointtruth} \label{thm:pointtruth}
+    If $p$ is a point distribution, then there is a deterministic algorithm $ALG$ which takes a distributional prediction $\hat p$ and has $c(ALG_p) - c(OPT_p) \leq O(EMD(\hat p, p))$.
+\end{restatable} 
+
+In other words, we will give a new algorithm that achieves the same bound as in~\cite{kumar2024improvingonlinealgorithmsml} deterministically without sampling, i.e., we derandomize the point prediction based algorithm. 
+
+
+First, we give Algorithm~\ref{alg:point truth algo}, in the setting that we have a distributional prediction $\hat{p}$ and a point truth $T$.
+
+\begin{algorithm}
+\caption{Deterministic algorithm with additive loss $O(\mathrm{EMD})$ in the $\hat{p}$--$T$ (point truth) setting}
+\label{alg:point truth algo}
+\begin{algorithmic}[1]
+
+\IF{the optimal policy for $\hat p$ is $A_0$}
+    \STATE Buy at the beginning, i.e., $ALG = A_0$
+
+\ELSIF{the optimal policy for $\hat{p}$ is $A_\infty$}
+    \STATE Keep renting, i.e., $ALG = A_\infty$
+
+\ELSE
+    \IF{$K \geq b$}
+        \IF{$\sum_{t \leq b} \hat{p}_t \geq \frac{1}{3}$}
+            \STATE Keep renting, i.e., $ALG = A_\infty$
+        \ELSE
+            \STATE Buy at the beginning, i.e., $ALG = A_0$
+        \ENDIF
+    \ELSE
+        \IF{$\sum_{t \leq K} \hat{p}_t \geq 0.025$}
+            \STATE Keep renting, i.e., $ALG = A_\infty$
+        \ELSE
+            \STATE Buy at the beginning of day $K+1$, i.e., $ALG = A_K$
+        \ENDIF
+    \ENDIF
+\ENDIF
+
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:point truth algo} distinguishes cases according to the structure of the optimal policy under the predicted distribution $\hat p$. If the optimal policy for $\hat p$ is to buy at the beginning or to keep renting, the algorithm follows this policy. Otherwise, the optimal policy is of the form $A_K$ for some finite $K$. When $K>b$, the algorithm chooses between $A_0$ and $A_\infty$ depending on the prefix mass of $\hat p$ up to time $b$. When $K \le b$, the algorithm compares the prefix mass up to $K$ against a fixed threshold and either keeps renting or uses $A_K$. 
+
+
+Note that in the point-truth setting, the EMD can be written as
+\[EMD(\hat{p},T)=\sum_{t} |t-T|\hat{p}_t = \sum_{t<T}(T-t)\hat{p}_t + \sum_{t>T}(t-T)\hat{p}_t,\]
+where $\hat{p}$ is our prediction and $T$ is the truth. Since in this appendix the truth is always a point $T$, when there is no ambiguity, we will simply denote $(A_K)_T$ as $A_K$ (also for $A_0$ and $A_\infty$).
+
+For sake of completeness, we give an example that blindly following the optimal policy for prediction $\hat{p}$ as in~\cite{kumar2024improvingonlinealgorithmsml} does not perform well when the truth is a point.
+
+
+\begin{Example}
+\label{blindly follow bad example}
+    Let $\hat{p}_t = \begin{cases} 1 - 2^{-n}, & \text{if } t = b-1, \\ 2^{-n}, & \text{if } t = 2b \end{cases}$ where $n$ is sufficiently large and $T=b+1$. Since $c(A_{b-1})=(b-1)(1-2^{-n})+(2b-1)\cdot 2^{-n} = b-1+b \cdot 2^{-n}<b=c(A_0)$ when $n>log(b)$, it turns out that the optimal policy for $\hat{p}$ is $A_{b-1}$. Blindly using $A_{b-1}$ when the truth $T=b+1$ costs $2b-1$, while the optimal cost is $b$ as $T \geq b$. Thus, the difference is $b-1$. On the other hand, one can compute that $EMD=2(1-2^{-n})+(b-1)\cdot 2^{-n}<2+(b-1)\cdot \frac{1}{b}<3$ is a constant. Thus, $\text{diff} \geq \Omega(b\cdot EMD)$.
+\end{Example}
+
+Algorithm~\ref{alg:point truth algo} follows the prediction when the optimal policy for $\hat{p}$ is either $A_0$ or $A_\infty$. We have the following lemma.
+
+\begin{lemma}
+    \label{phat and p choose from A_0 and Ainf}
+    Assume that $\hat{p}$ is the distributional prediction and $T$ is the unknown truth. If the optimal policy for both $\hat{p}$ is restricted to be either $A_0$ or $A_\infty$, then by taking $ALG=OPT_{\hat{p}}$ we have $\text{diff}_T = c(ALG_T)-c(OPT_T) \leq EMD(\hat{p},T)$.
+\end{lemma}
+
+\begin{proof}
+    For simplicity, in the proof we generalize the point truth $T$ to a distributional truth $p$ whose optimal policy is also either $A_0$ or $A_\infty$. Thus, our statement is a special case, since the optimal policy for the point truth is either $A_0$ or $A_\infty$.
+    
+    It is trivial when the optimal policies for both $\hat{p}$ and $p$ are $A_0$ or both are $A_\infty$, as we have $\text{diff}_p = 0$. Thus, let us consider the case where the optimal policy for $\hat{p}$ is $A_0$ while that for $p$ is $A_\infty$, and vice versa.  
+
+    When the optimal policy for $\hat{p}$ is $A_0$ while that for $p$ is $A_\infty$, we have $\text{diff}_p = b - \sum_{t} tp_t$. Note that under $\hat{p}$, $b \leq \sum_{t} t \hat{p}_t$. Thus, $\text{diff}_p \leq \sum_{t} t \hat{p}_t - \sum_{t} tp_t \leq EMD(\hat{p},p)$, where the last inequality holds by the centroid lower bound of the $EMD$. For readers who do not familiar with the centroid lower bound, a proof for centroid lower bound of the $EMD$ is deferred to Appendix~\ref{appendix:centroid_proof}.
+
+    When the optimal policy for $\hat{p}$ is $A_\infty$ while that for $p$ is $A_0$, we have $\text{diff}_p = \sum_{t} tp_t - b$. Note that under $\hat{p}$, $\sum_{t} t \hat{p}_t \leq b$. Thus, $\text{diff}_p \leq \sum_{t} tp_t - \sum_{t} t \hat{p}_t \leq EMD(\hat{p},p)$, where the last inequality again holds by the centroid lower bound.
+\end{proof}
+
+Lemma~\ref{phat and p choose from A_0 and Ainf} implies that the additive loss can be bounded by $EMD(\hat{p},T)$ when the optimal policy for $\hat{p}$ is either $A_0$ or $A_\infty$ and we blindly follow it. Thus, the only thing left is to show that Theorem~\ref{thm:pointtruth} holds when~$A_K$ is the optimal policy for $\hat{p}$ for some $K \in \mathbb{N}_+$. First, we consider the case where $K \geq b$. We have the following lemma.
+
+\begin{lemma}
+    \label{when K>=b}
+    Assume that $A_K$ is the optimal policy for $\hat{p}$ where $K \geq b$. Consider $\sum_{t \leq b} \hat{p}_t$, i.e. the total mass in the $b$-prefix of $\hat{p}_t$. If $\sum_{t \leq b} \hat{p}_t \geq \frac{1}{3}$, we set $ALG=A_\infty$. Otherwise, we set $ALG=A_0$. Then, $\text{diff}_T = c(ALG_T)-c(OPT_T) \leq O(EMD(\hat{p},T))$.
+\end{lemma}
+
+\begin{proof}
+    Since $A_K$ is the optimal policy for $\hat{p}$, we have $c(A_K) \leq c(A_0)$. Thus,
+    \begin{align*}
+    c(A_K) \leq b &\iff \sum_{t \leq K} t\hat{p}_t + \sum_{t>K} (K+b)\hat{p}_t \leq b \\
+    &\iff \sum_{t \leq K} t\hat{p}_t + (K+b) - (K+b)\sum_{t \leq K} \hat{p}_t \leq b \\
+    &\iff K \leq \sum_{t \leq K} (K+b-t) \hat{p}_t = \sum_{t \leq b} (K+b-t) \hat{p}_t + \sum_{b < t \leq K} (K+b-t) \hat{p}_t
+    \end{align*}
+
+    Thus, $K \leq (K+b)\sum_{t \leq b}\hat{p}_t + K \sum_{b < t \leq K} \hat{p}_t \leq 2K \sum_{t \leq b}\hat{p}_t + K \sum_{b < t \leq K} \hat{p}_t$. The first inequality holds since $K+b-t<K$ when $b<t$, and the second holds since $K \geq b$. Dividing $K$ on both sides, we get $1 \leq 2\sum_{t \leq b}\hat{p}_t + \sum_{b < t \leq K} \hat{p}_t$.
+
+    The above inequality guarantees that $\sum_{t \leq b}\hat{p}_t \geq \frac{1}{3}$ or $\sum_{b < t \leq K} \hat{p}_t \geq \frac{1}{3}$, or both. Now, if~$\sum_{t \leq b}\hat{p}_t \geq \frac{1}{3}$, we have $ALG = A_\infty$. Otherwise, it must be $\sum_{b < t \leq K} \hat{p}_t \geq \frac{1}{3}$, we have $ALG=A_0$.
+
+    For $\sum_{t \leq b}\hat{p}_t \geq \frac{1}{3}$, if $T \leq b$, then our $ALG$ is optimal and $\text{diff}_T$ is zero. If $T>b$, $c(ALG_T)=T$ and $c(OPT_T)=b$, then $\text{diff}_T = T-b$. Thus, we have $\text{diff}_T = T-b \leq O(EMD(\hat{p},T))$ because $EMD(\hat{p},T) \geq (\sum_{t \leq b}\hat{p}_t)\cdot(T-b)\geq \frac{1}{3}(T-b)$.
+
+    For $\sum_{b < t \leq K} \hat{p}_t \geq \frac{1}{3}$, if $T \geq b$, then our $ALG$ is optimal and $\text{diff}_T$ is zero. If $T<b$, $c(ALG_T)=b$ and $c(OPT_T)=T$, then $\text{diff}_T = b-T$. Thus, since $T<b \leq K$, we have $\text{diff}_T = b-T \leq O(EMD(\hat{p},T))$ because $EMD(\hat{p},T) \geq (\sum_{b < t \leq K} \hat{p}_t)\cdot(b-T)\geq \frac{1}{3}(b-T)$.
+\end{proof}
+
+Next, we consider the case where $K<b$. Intuitively, a significant amount of mass must be in the $K$-prefix to make the optimal policy $A_K$ choose to rent for a while and then buy on day~$K+1$. The following observation illustrates the minimum amount of mass that needs to be in the~$K$-prefix.
+
+\begin{observation}
+    \label{K prefix needs significant mass}
+    Assume that $A_K$ is optimal. In the proof of Lemma~\ref{when K>=b}, by comparing the cost between $A_K$ and $A_0$, we have $K \leq \sum_{t \leq K} (K+b-t) \hat{p}_t \leq (K+b)\sum_{t \leq K} \hat{p}_t$. This implies $\sum_{t \leq K} \hat{p}_t \geq \frac{K}{K+b}$.
+\end{observation}
+
+The next lemma considers the case where $K<b$ and there is enough mass in the $K$-prefix.
+
+\begin{lemma}
+    \label{K<b and K prefix constant mass}
+    Assume that $A_K$ is the optimal policy for $\hat{p}$ where $K<b$ and $\sum_{t \leq K} \hat{p}_t \geq 0.025$. Taking $ALG=A_\infty$, we have $\text{diff}_T = c(ALG_T)-c(OPT_T) \leq O(EMD(\hat{p},T))$.
+\end{lemma}
+
+\begin{proof}
+    Let $ALG=A_\infty$. If $T \leq b$, then our $ALG$ is optimal and $\text{diff}_T$ is zero. If $T>b$, $c(ALG_T)=T$ and $c(OPT_T)=b$, then $\text{diff}_T = T-b$. Thus, we have $\text{diff}_T = T-b \leq O(EMD(\hat{p},T))$ because $EMD(\hat{p},T) \geq 0.025\cdot(T-K)\geq 0.025 \cdot (T-b)$.
+\end{proof}
+
+Finally, we prove the case in our algorithm when there is not enough mass in the $K$-prefix.
+
+\begin{lemma}
+    \label{K prefix subconstant mass}
+    Assume that $A_K$ is the optimal policy for $\hat{p}$ where $\sum_{t \leq K} \hat{p}_t < 0.025$. Taking $ALG=A_K$, we have $\text{diff}_T = c(ALG_T)-c(OPT_T) \leq O(EMD(\hat{p},T))$.
+\end{lemma}
+
+\begin{proof}
+    Since $\sum_{t \leq K} \hat{p}_t < 0.025$, by Observation~\ref{K prefix needs significant mass}, we know that $K$ cannot be too large. In particular, $K<b/2$.
+    
+    If $T \leq K$, our algorithm $ALG=A_K$ is optimal.
+
+    If $K<T<b/2$, $c(ALG_T)=K+b$ and $c(OPT_T)=T$, then $\text{diff}_T = K+b-T$. If $\sum_{t \geq b}\hat{p}_t \geq 0.025$, then we have $\text{diff}_T = K+b-T \leq b \leq O(EMD(\hat{p},T))$ because $EMD(\hat{p},T) \geq 0.025\cdot(b-T)\geq 0.025 \cdot \frac{b}{2}$. Hence, we can assume that both $\sum_{t \leq K}\hat{p}_t < 0.025$ and $\sum_{t \geq b}\hat{p}_t < 0.025$. If $\sum_{\frac{3}{4}b<t<b}\hat{p}_t \geq 0.2$, then $\text{diff}_T \leq b \leq O(EMD(\hat{p},T))$ because $EMD(\hat{p},T) \geq 0.02\cdot(\frac{3}{4}b-T)\geq 0.02 \cdot (\frac{3}{4}b - \frac{1}{2}b)$, and we are done. So, suppose that $\sum_{\frac{3}{4}b<t<b}\hat{p}_t < 0.2$. Then $\sum_{K<t \leq \frac{3}{4}b}\hat{p}_t > 1- 0.2-2\cdot 0.025=0.75$. We will show that the mass in the $\frac{3}{4}b$-prefix is enough to make $A_{\frac{3}{4}b}$ a better policy than $A_K$. In fact,
+    \begin{align*}
+    c(A_{\frac{3}{4}b}) - c(A_K) =& \left( \sum_{t \leq \frac{3}{4}b} t\hat{p}_t + \sum_{t>\frac{3}{4}b} (\frac{3}{4}b +b)\hat{p}_t \right) -  
+    \left( \sum_{t \leq K} t\hat{p}_t + \sum_{t>K} (K +b)\hat{p}_t \right)\\
+    =& \sum_{t>\frac{3}{4}b}\left( \frac{3}{4}b - K \right)\hat{p}_t - \sum_{K< t \leq \frac{3}{4}b} \left( K+b-t \right)\hat{p}_t\\
+    <& \left( \frac{3}{4}b - K \right) \cdot \sum_{t>\frac{3}{4}b}\hat{p}_t - \left( \frac{1}{4}b + K \right)\cdot \sum_{K< t \leq \frac{3}{4}b}\hat{p}_t \\
+    <& \left( \frac{3}{4}b - K \right) \cdot 0.25 - \left( \frac{1}{4}b + K \right)\cdot 0.75 <0,
+    \end{align*}
+    which contradicts with the fact that $A_K$ is the optimal policy.
+
+    If $b/2 \leq T <b$, $\text{diff}_T = K+b-T$. Note that by Observation~\ref{K prefix needs significant mass} and the fact that the mass in the $K$-prefix is less than 0.025, we have in particular $K < \frac{b}{8}$. First, $K \leq O(EMD(\hat{p},T))$, since
+    \[3EMD(\hat{p},T) \geq 3(T-K)\sum_{t \leq K}\hat{p}_t \geq \frac{3(T-K)}{b+K}\cdot K \geq K\]
+    where the last inequality holds because $b+4K<\frac{3}{2}b \leq 3T$. Hence, we only need to show that $b-T \leq O(EMD(\hat{p},T))$. Since $c(A_K) \leq c(A_\infty)$, we have 
+    \begin{align*}
+    b \leq \sum_{t} t\hat{p}_t + \left(b-c(A_K)\right) &\iff 0 \leq \sum_{t<T} (t-b)\hat{p}_t + \sum_{t\geq T} (t-b)\hat{p}_t + (b-c(A_K))\\
+    &\iff \sum_{t<T} (b-t)\hat{p}_t \leq \sum_{t\geq T} (t-b)\hat{p}_t + (b-c(A_K)).
+    \end{align*}
+    Since $b-T<b-t$ for $t<T$ , it implies that 
+    \begin{align*}
+    & (b-T)\sum_{t<T} \hat{p}_t \leq \sum_{t\geq T} (t-b)\hat{p}_t + (b-c(A_K)) \\
+    \iff & b-T \leq \sum_{t\geq T}(t-T)\hat{p}_t+ (b-c(A_K)).
+    \end{align*}
+    
+    
+    If we can show that $b-c(A_K) \leq 3 \sum_{t\leq K}(T-t)\hat{p}_t$, then $b-T \leq O(EMD(\hat{p},T))$ since
+    $b-T \leq 3\sum_{t\geq T}(t-T)\hat{p}_t + 3 \sum_{t\leq K}(T-t)\hat{p}_t \leq 3EMD(\hat{p},T)$, we are done. This holds because 
+    \[b-c(A_K) = \sum_{t \leq K}(K+b-t)\hat{p}_t-K \leq \sum_{t \leq K}(K+b)\hat{p}_t \leq \sum_{t \leq K}(3T-3K)\hat{p}_t = 3\sum_{t \leq K}(T-K)\hat{p}_t \leq 3\sum_{t \leq K}(T-t)\hat{p}_t,\]
+    where the second inequality holds since $4K+b \leq 3T$ when $T \geq \frac{b}{2}$.
+
+    If $T\geq b$, $c(ALG_T)=K+b$ and $c(OPT_T)=b$, then $\text{diff}_T = K$. Again by Observation~\ref{K prefix needs significant mass}, $EMD(\hat{p},T) \geq \frac{K}{b+K}(T-K)$, which implies that $2EMD(\hat{p},T) \geq \frac{2(T-K)}{b+K}K>K=\text{diff}_T$, where the last inequality holds since $2T>b+3K$. Thus, $\text{diff}_T\leq O(EMD(\hat{p},T))$.
+
+    This proves Lemma~\ref{K prefix subconstant mass}.
+\end{proof}
+
+
+We can now prove Theorem~\ref{thm:pointtruth}.
+
+\begin{proof}[Proof of Theorem~\ref{thm:pointtruth}]
+    Theorem~\ref{thm:pointtruth} follows directly from the combination of Lemma~\ref{phat and p choose from A_0 and Ainf} and Lemmas~\ref{when K>=b}, \ref{K<b and K prefix constant mass}, and \ref{K prefix subconstant mass}.
+\end{proof}
+
+One can similarly use the same idea to develop a $\lambda$-robust version for Algorithm~\ref{alg:point truth algo} as we did in Algorithm~\ref{alg:new lambda-robustification}. Since this is not the main part of the paper, we omit the proof here.
+
+
+\section{Proof of the centroid lower bound of the EMD} \label{appendix:centroid_proof}
+
+Here is a proof for the centroid lower bound of the EMD for sake of completeness. One can also find a similar proof in~\cite{centroidlowerbound}. 
+
+
+\begin{thm}[Centroid lower bound for Earth Mover's Distance]
+\label{thm:centroid-lower-bound}
+Let $p$ and $\hat p$ be two probability distributions supported on $\{1,2,\dots,N\}$, i.e., $\sum_{t=1}^N p_t = \sum_{t=1}^N \hat p_t = 1$. Then we have
+\[\left| \sum_{t=1}^N t \, p_t \;-\; \sum_{t=1}^N t \, \hat p_t \right|
+\;\le\;
+EMD(p,\hat p).\]
+\end{thm}
+
+\begin{proof}
+Consider any feasible transportation plan $F = (f_{ij})_{i,j \in [N]}$ from $p$ to $\hat p$, i.e., $f_{ij} \ge 0$ for all $i,j$, and
+\[\sum_{j=1}^N f_{ij} = p_i \quad\text{and}\quad \sum_{i=1}^N f_{ij} = \hat p_j.\]
+We can rewrite the difference of centroids as
+\[\sum_{i=1}^N i\,p_i - \sum_{j=1}^N j\,\hat p_j= \sum_{i=1}^N \sum_{j=1}^N f_{ij}\,i - \sum_{j=1}^N \sum_{i=1}^N f_{ij}\,j= \sum_{i=1}^N \sum_{j=1}^N f_{ij}(i-j).\]
+Taking absolute values and applying the triangle inequality,
+\[ \left| \sum_{i=1}^N \sum_{j=1}^N f_{ij} (i - j) \right| \;\le\; \sum_{i=1}^N \sum_{j=1}^N f_{ij} \, |i - j|.\]
+Since this holds for any feasible transportation plan $F$, it in particular holds for the optimal plan achieving $EMD(p,\hat p)$. Thus,
+\[ \left| \sum_{i=1}^N i \, p_i - \sum_{j=1}^N j \, \hat p_j \right| \;\le\; RHS =  EMD(p,\hat p), \]
+which completes the proof.
+\end{proof}
+
+

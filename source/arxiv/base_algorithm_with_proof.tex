@@ -1,0 +1,250 @@
+\section{Base algorithm}
+\label{appendix:analysis of the main algorithm}
+
+In this section we focus on our base algorithm and analysis: we design an algorithm that uses a distributional prediction in an essentially optimal way (as the lower bounds discussed earlier show).  We first give our base algorithm formally in Algorithm~\ref{alg:distributional truth algo}. This algorithm guarantees an upper bound (Theorem~\ref{thm:main}). We present the intuition of our proof (Appendix~\ref{sec:intuition of base proof}), followed by a full proof of it (Appendix~\ref{sec:full proof of base algorithm}). Without loss of generality, we assume that $\sqrt{b}$ is an integer; otherwise, we can use $\lfloor \sqrt{b} \rfloor$ instead. 
+
+
+\begin{algorithm}
+\caption{Base algorithm, with expected additive loss bounded by $O(\sqrt{b}\max(\mathrm{EMD},1))$}
+\label{alg:distributional truth algo}
+\begin{algorithmic}[1]
+\IF{$A_{\hat{K}}$ is the optimal policy for $\hat{p}$ with some finite $\hat{K}$}
+    \STATE Buy at the beginning of day $\hat{K}+\sqrt{b}+1$, i.e., $ALG = A_{\hat{K}+\sqrt{b}}$
+\ELSE
+    \STATE Keep renting, i.e., $ALG = A_{\infty}$
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+In other words, Algorithm~\ref{alg:distributional truth algo} distinguishes two cases depending on the optimal policy under the predicted distribution $\hat p$.  If the optimal policy for $\hat p$ is of the form $A_{\hat K}$ for some finite $\hat K$, the algorithm delays the purchase time by an additive $\sqrt b$ and buys at time $\hat K + \sqrt b + 1$. Otherwise, when the optimal policy for $\hat p$ is $A_{\infty}$, the algorithm simply keeps renting and never buys.
+
+
+Recall the statement of Theorem~\ref{thm:main}:
+
+\maintheorem*
+
+To prove Theorem~\ref{thm:main},
+we break into cases depending on the structure of the optimal policies for $\hat p$ and $p$. We first prove Theorem~\ref{thm:main} when the optimal policy for $\hat p$ is $A_{\infty}$ (Lemma~\ref{lm:phat Ainf and p AK with EMD O1}). When the optimal policy for $\hat{p}$ is $A_K$ with finite $K$ the analysis is more complicated, and we need to break into two further cases depending on the true optimal policy for $p$. In Lemma~\ref{lm:phat is AK and p is Ainf and root b loss} we prove the theorem for the optimal policy (for $p$) being $A_{\infty}$ and in Lemma~\ref{lm:phat is AKhat and p is AK root b loss} we consider the case when both the optimal policies for $p$ and for $\hat p$ involve buying at some finite time.  Together, these lemmas directly imply Theorem~\ref{thm:main}.  
+
+
+\subsection{Intuition of proof}
+\label{sec:intuition of base proof}
+
+While the full proof is in Appendix~\ref{sec:full proof of base algorithm}, we now provide some intuition about it.
+First, it is helpful for us to break into cases depending on the optimal policies for $p$ and $\hat p$ (as discussed above) because once we know the optimal policy we can explicitly write down the cost of the optimal policy, which allows us to write $\text{diff}_p$ explicitly.  
+
+Now suppose that the true distribution were actually $\hat p$ rather than $p$.  Then clearly our algorithm is optimal if this policy is $A_{\infty}$, and otherwise is suboptimal.  But we can also consider what happens if we run $OPT_p$ (the optimal policy for $p$) when the truth is $\hat p$, and we can define $\text{diff}_{\hat p}$ as the expected cost of our algorithm minus the expected cost of $OPT_p$ when the true distribution is $\hat p$.  So $\text{diff}_{\hat p}$ is nonpositive when our policy is $A_{\infty}$ (since in this case we are optimal), but otherwise can be quite large.
+
+If it \emph{were} true that $\text{diff}_{\hat p}$ was always small, then a natural strategy would be to start with that as a baseline and analyze how the $\text{diff}_p$ increases when compared with $\text{diff}_{\hat p}$.  In other words, we could try to argue that $\text{diff}_p - \text{diff}_{\hat p} \leq O(\sqrt{b}\max(EMD(\hat{p},p),1))$, which would then imply Theorem~\ref{thm:main} if $\text{diff}_{\hat p}$ were small enough.  Unfortunately this runs into two related issues.  First, $\text{diff}_{\hat p}$ could be extremely negative, making our desired claim false.  Second, $\text{diff}_{\hat p}$ could be extremely large and positive, making the claim true but insufficient to prove Theorem~\ref{thm:main}.  Fortunately, we can get around both of these issues in the same way: we can simply normalize by $\text{diff}_{\hat p}$.  More formally, we can prove that $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b}\max(EMD(\hat{p},p),1)) - \text{diff}_{\hat{p}}$.  Simply adding $\text{diff}_{\hat p}$ to both sides then implies the theorem.  
+
+So our strategy is try to bound $\text{diff}_p - \text{diff}_{\hat{p}}$.  This is about the change in the $\text{diff}$ function when the distribution changes from $\hat p$ to $p$, and so a natural approach is to utilize the optimal transport plan from $\hat p$ to $p$.  We call each value $f(x,y)$ in this transport plan a \emph{map}, since it tells us how much probability mass to move from $x$ to $y$.  Some of the maps either benefit us (i.e., result in $\text{diff}_p$ decreasing compared to $\text{diff}_{\hat p}$) or result in an increase that can still be bounded in simple ways (e.g., directly bounded by $EMD(\hat p, p)$). We call such maps \emph{good maps} and all others are \emph{bad maps}, and only need concern ourselves with bad maps.  Although which maps are bad depends on which precise case we are in, we generally split the bad maps into two types: maps that move mass from $t_1$ to $t_2$ with $|t_1-t_2| \geq \sqrt{b}$ and maps that move mass from $t_1$ to $t_2$ with $|t_1-t_2| < \sqrt{b}$. If a map is in the regime where the moving distance is large (larger than $\sqrt{b}$), the amount of mass moved by this map is then bounded by $\frac{EMD(\hat p, p)}{\sqrt{b}}$ by the definition of $EMD(\hat p, p)$. This is a small enough amount of mass that we can straightforwardly argue that the increase it causes lies within our desired bound.
+
+If a map is in the regime where the moving distance is small (smaller than $\sqrt{b}$), then we instead directly use the fact that our policy is related to (though not identical to) the optimal policy for $\hat p$.  In particular, an obvious observation is that when moving mass from $\hat{p}$ to $p$ using those bad maps in the optimal transport plan, the amount of mass one can move from point $t$ is at most $\hat{p}_t$. So if we can argue that $\hat p_t$ is small, then we get that these types of bad maps move a small amount of mass a small distance, and so the increase they cause in the $\text{diff}$ function still lives within our desired bound.  And it turns out that we can indeed show this, although the precise guarantee and strategy is different for different cases. 
+ But for example, when the optimal policy for $\hat{p}$ is $A_K$, it is intuitively true (and can be made formal) that $\sum_{t=K}^{K+\delta} \hat p_t$ has to be small when $\delta$ is small (otherwise renting $K$ times then buying would not be the optimal policy; it would be better for us to wait a little longer to buy). Therefore, we leverage the mass distribution in 
+$\hat{p}$ to connect the change in additive loss $\text{diff}_p - \text{diff}_{\hat{p}}$ with the required bound $O(\sqrt{b}\max(EMD(\hat{p},p),1)) - \text{diff}_{\hat{p}}$. 
+
+
+\subsection{Full proof}
+\label{sec:full proof of base algorithm}
+
+This section gives the technical proofs of Theorem~\ref{thm:main}.
+we break into cases depending on the optimal policies for $\hat{p}$ and $p$ to get the claimed bound.
+
+
+\begin{lemma}
+    \label{lm:phat Ainf and p AK with EMD O1}
+    Let $\hat{p}$ be the prediction and $p$ be the unknown truth. If the optimal policy for $\hat{p}$ is $A_\infty$, then taking $ALG=A_\infty$, we have $\text{diff}_p = c(ALG_p) - c(OPT_p) \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$.
+\end{lemma}
+
+\begin{proof}
+    If the optimal policy for $p$ is also $A_\infty$, then $\text{diff}_p = 0$ and the required bound holds trivially. Thus, we only need to show that the bound holds when the optimal policy for $p$ is $A_K$ for some finite $K$.
+
+    First, we have 
+    $$\text{diff}_p = \sum_{t=1}^N tp_t - (\sum_{t \leq K}tp_t + \sum_{t>K}(K+b)p_t) = \sum_{t>K}(t-(K+b))p_t.$$ 
+    Since $\text{diff}_p$ is a function of $p$, we similarly define $\text{diff}_{\hat{p}}$ as the quantity by using the same policies but the different distribution $\hat{p}$ rather than $p$. In other words, $\text{diff}_{\hat{p}} = c(ALG_{\hat{p}}(\hat{p})) - c((OPT_p)_{\hat{p}})$. Then, we consider the optimal transport plan from $\hat{p}$ to $p$ and examine the change of the additive loss $\text{diff}_p - \text{diff}_{\hat{p}}$. We want to show that $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b}\max(EMD(\hat{p},p),1)) - \text{diff}_{\hat{p}}$. That is, we want this change in additive loss to be bounded by $O(\sqrt{b}\max(EMD(\hat{p},p),1)) - \text{diff}_{\hat{p}}$.
+
+    Note that $A_\infty$ is the optimal policy for $\hat{p}$, we have $\text{diff}_{\hat{p}} \leq 0$ and 
+    \[\text{diff}_{\hat{p}} = \sum_{t>K}(t-(K+b))\hat{p}_t = \sum_{t>K+b}(t-(K+b))\hat{p}_t - \sum_{K<t<K+b}(K+b-t)\hat{p}_t \leq 0.\]
+    We divide the domain into 3 regions: $[1,K], (K,K+b], (K+b,\infty)$. There are two kinds of maps in the optimal transport plan: from some point in $(K,K+b]$ to some point in $[1,K]$, or not in such a form. If we consider how a map from one region to any region (including itself) affects the change in additive loss, notice that for any map that is not from $(K,K+b]$ to $[1,K]$, the change in additive loss by the map is at most its own contribution to the Earth Mover's Distance.
+    To argue this, if a map is from~$[1,K]$ to~$[1,K]$, then it does not affect the change in additive loss. If a map is from~$[1,K]$ to~$(K,K+b]$, then it only decreases the value and hence benefits us. If a map is from~$t_1 \in [1,K]$ to~$t_2 \in (K+b,\infty)$ with mass~$\epsilon$, then it increases the value by~$(t_2 - (K+b))\epsilon < (t_2-t_1)\epsilon$ which equals its contribution to the~$EMD$. If a map is from~$t_1 \in (K,K+b]$ to~$t_2 \in (K,K+b]$ with mass~$\epsilon$, then it changes the value by~$(K+b-t_1)\epsilon - (K+b-t_2)\epsilon \leq |t_1-t_2|\epsilon$ which equals its contribution to the~$EMD$. If a map is from~$t_1 \in (K,K+b]$ to~$t_2 \in (K+b,\infty)$ with mass~$\epsilon$, then it increases the value by~$(K+b-t_1)\epsilon + (t_2 - (K+b))\epsilon = (t_2-t_1)\epsilon$ which equals its contribution to the~$EMD$. If a map is from~$(K+b,\infty)$ to~$[1,K]$ or from~$(K+b,\infty)$ to~$(K,K+b]$, then again it only decreases the value and benefits us. If a map is from~$t_1 \in (K+b,\infty)$ to~$t_2 \in (K+b,\infty)$ with mass~$\epsilon$, then it changes the value by~$(t_2-(K+b))\epsilon - (t_1-(K+b))\epsilon = (t_2-t_1)\epsilon$ which equals its contribution to the~$EMD$.
+    Thus, if we consider all such maps (not from~$(K,K+b]$ to~$[1,K]$) as a group, it will increase the additive loss by some amount bounded by $EMD(\hat{p},p)$ which is at most a constant. We call such maps in this easy case the good maps and those we need to take further actions the bad maps.
+
+    For maps (elements in the optimal transport plan) from $(K,K+b]$ to $[1,K]$, we have $\text{diff}_p - \text{diff}_{\hat{p}} = \sum_{K<t<K+b}(K+b-t)(\hat{p}_t - p_t)$. Let us first consider the set of bad maps $\mathcal{B}_1$ from $(K+\sqrt{b},K+b]$ to $[1,K]$. Since the moving distance for such map is at least $\sqrt{b}$, the total mass moving by such bad maps is at most $O(\frac{EMD}{\sqrt{b}})$. Thus, 
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}} \right|_{\mathcal{B}_1} \leq (K+b-(K+\sqrt{b}))\sum_{K+\sqrt{b}<t\leq K+b}\left. \epsilon_t \right|_{\mathcal{B}_1} \leq (b-\sqrt{b})\cdot O(\frac{EMD}{\sqrt{b}})=O(\sqrt{b}\cdot EMD),$$
+    where $\left. \epsilon_t \right|_{\mathcal{B}_1} = \left. \hat{p}_t - p_t \right|_{\mathcal{B}_1}$ is the mass change by all such bad maps in $\mathcal{B}_1$ at $t$ for any point $K+\sqrt{b}<t \leq K+b$.
+
+    Then, let us consider the set of bad maps $\mathcal{B}_2$ from $(K,K+\sqrt{b}]$ to $[1,K]$. We will discuss the change in additive loss by such bad maps in $\mathcal{B}_2$. That is, we want to bound 
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}} \right|_{\mathcal{B}_2} = \sum_{K<t \leq K+\sqrt{b}}(K+b-t) \left. (\hat{p}_t - p_t) \right|_{\mathcal{B}_2}= \sum_{K<t \leq K+\sqrt{b}}(K+b-t)\left. \epsilon_t \right|_{\mathcal{B}_2},$$
+    where $\left. \epsilon_t \right|_{\mathcal{B}_2} = \left. \hat{p}_t - p_t \right|_{\mathcal{B}_2}$ is the mass change by all such bad maps in $\mathcal{B}_2$ at $t$ for any point $K<t \leq K+\sqrt{b}$. Note that it suffices to show that $\left. \text{diff}_p - \text{diff}_{\hat{p}} \right|_{\mathcal{B}_2} \leq O(\sqrt{b})- \text{diff}_{\hat{p}}$ to get our required result.
+
+    Recall that in $\hat{p}$, $A_\infty$ is the optimal policy. Thus, we have
+     \begin{align}
+    & c((A_\infty)_{\hat{p}}) \leq c((A_{K+\sqrt{b}})_{\hat{p}}) \notag \\
+    \iff & \sum_t t\hat{p}_t \leq \sum_{t \leq K+\sqrt{b}} t\hat{p}_t + \sum_{t>K+\sqrt{b}}(K+\sqrt{b}+b)\hat{p}_t \notag \\
+    \iff & \sum_{t > K+\sqrt{b}} t\hat{p}_t \leq \sum_{t>K+\sqrt{b}}(K+\sqrt{b}+b)\hat{p}_t \notag \\
+    \iff & \sum_{t > K+b} (t- (K+\sqrt{b}+b))\hat{p}_t \leq \sum_{K+\sqrt{b}<t \leq K+b}(K+\sqrt{b}+b-t)\hat{p}_t \notag \\
+    \iff & \sum_{t > K+b} (t- (K+b))\hat{p}_t \leq \sum_{t > K+b}\sqrt{b}\hat{p}_t + \sum_{K+\sqrt{b}<t \leq K+b}(K+\sqrt{b}+b-t)\hat{p}_t. \quad \label{eq:dagger} \tag{\(\dagger\)}
+    \end{align}
+
+    By the definition of $\left. \epsilon_t \right|_{\mathcal{B}_2}$, we know that $\left. \epsilon_t \right|_{\mathcal{B}_2} \leq \hat{p}_t$ for $K<t \leq K+\sqrt{b}$. Therefore, to show that $\left. \text{diff}_p - \text{diff}_{\hat{p}} \right|_{\mathcal{B}_2} \leq O(\sqrt{b})- \text{diff}_{\hat{p}} = O(\sqrt{b})- (\sum_{t>K}(t-(K+b))\hat{p}_t)$, it suffices to show that
+    \[\sum_{K<t \leq K+\sqrt{b}}(K+b-t)\hat{p}_t \leq O(\sqrt{b})- \sum_{t>K}(t-(K+b))\hat{p}_t\]
+    which is equivalently
+    \[\sum_{t>K+b} (t-(K+b))\hat{p}_t \leq O(\sqrt{b}) + \sum_{K+\sqrt{b}<t\leq K+b} (K+b-t)\hat{p}_t.\]
+    The last line holds because of~\eqref{eq:dagger}.
+
+    By combining results from good maps and bad maps, we finally get the required result.
+\end{proof}
+
+Next, we show that when the optimal policy for $\hat{p}$ is $A_K$ for some finite $K$, taking $ALG=A_{K+\sqrt{b}}$ implies the required bound. Before proving this, let us make some observations.
+
+\begin{observation}
+    \label{obs:AK plus root b is not too bad than AK}
+    $c((A_{K+\sqrt{b}})_{\hat{p}}) \leq c((A_{K})_{\hat{p}}) + \sqrt{b}$.
+\end{observation}
+
+\begin{proof}
+    We write down the definition of $c((A_{K+\sqrt{b}})_{\hat{p}})$ and $c((A_{K})_{\hat{p}})$. It is not hard to see that by taking the difference we have $c((A_{K+\sqrt{b}})_{\hat{p}}) - c((A_{K})_{\hat{p}}) \leq \sqrt{b} \sum_{t>K+\sqrt{b}}\hat{p}_t \leq \sqrt{b}$.
+\end{proof}
+
+\begin{claim}
+    \label{claim:if AK is opt policy then K to K+T cannot have too much mass}
+    Let $A_K$ be the optimal policy for $\hat{p}$. Then, for every $1 \leq T \leq b$, we have
+    \[\sum_{K<t\leq K+T}\hat{p}_t \leq \frac{T}{b}\sum_{t>K}\hat{p}_t.\]
+\end{claim}
+
+\begin{proof}
+    For $1 \leq T \leq b$, we will compare the cost of $A_K$ and $A_{K+T}$.
+    \begin{align*}
+    & c((A_K)_{\hat{p}}) \leq c((A_{K+T})_{\hat{p}}) \\
+    \iff & \sum_{t \leq K} t\hat{p}_t + \sum_{t>K}(K+b)\hat{p}_t \leq \sum_{t \leq K+T} t\hat{p}_t + \sum_{t>K+T}(K+T+b)\hat{p}_t \\
+    \iff & \sum_{K<t \leq K+T}(K+b)\hat{p}_t \leq \sum_{K<t \leq K+T} t\hat{p}_t + \sum_{t> K+T}T\hat{p}_t \\
+    \iff & \sum_{K<t \leq K+T}(K+b-t)\hat{p}_t \leq  \sum_{t> K+T}T\hat{p}_t.
+    \end{align*}
+    
+    Thus, we have 
+    \begin{align*}
+    b \sum_{K<t\leq K+T}\hat{p}_t \leq&  T \sum_{K<t \leq K+T} \hat{p}_t + \sum_{K<t \leq K+T}(K+b-t)\hat{p}_t\\
+    \leq& T \sum_{K<t \leq K+T} \hat{p}_t + T \sum_{t> K+T} \hat{p}_t=T \sum_{t>K}\hat{p}_t.
+    \end{align*}
+    That is, $\sum_{K<t\leq K+T}\hat{p}_t \leq \frac{T}{b}\sum_{t>K}\hat{p}_t$.
+\end{proof}
+
+Now, we can start with the proof. In the following lemmas, we will analyze the cases separately based on the optimal policy for $p$ to be either $A_\infty$ or some $A_L$, given that the optimal policy for $\hat{p}$ is $A_K$ for some finite $K$ as well as $ALG=A_{K+\sqrt{b}}$ always.
+
+
+\begin{lemma}
+    \label{lm:phat is AK and p is Ainf and root b loss}
+    Let $\hat{p}$ be the prediction and $p$ be the unknown truth. Assume that the optimal policy for~$\hat{p}$ is $A_K$ for some finite $K$. Let $ALG = A_{K+\sqrt{b}}$. If the optimal policy for $p$ is $A_\infty$, we have $\text{diff}_p = c(ALG_p) - c(OPT_p) \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$.
+\end{lemma}
+
+\begin{proof}
+    We want to show that $\text{diff}_p = c((A_{K+\sqrt{b}})_p) - c((A_\infty)_p) \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$. Consider $\text{diff}_{\hat{p}} = c((A_{K+\sqrt{b}})_{\hat{p}}) - c((A_\infty)_{\hat{p}})$. Since $A_K$ is the optimal policy for $\hat{p}$, we have $c((A_{K})_{\hat{p}}) - c((A_\infty)_{\hat{p}}) \leq 0$. By Observation~\ref{obs:AK plus root b is not too bad than AK}, we have 
+    \[\text{diff}_{\hat{p}} = c((A_{K+\sqrt{b}})_{\hat{p}}) - c((A_\infty)_{\hat{p}}) \leq c((A_{K})_{\hat{p}}) + \sqrt{b}- c((A_\infty)_{\hat{p}}) \leq \sqrt{b}.\]
+    It turns out that if we can show $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$, then $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b} \max(EMD(\hat{p},p),1)) - \text{diff}_{\hat{p}}$ and we are done.
+
+    To show that $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$, again we use the optimal transport plan and analyze the bad maps. After simple calculations, we have 
+    $$\text{diff}_{\hat{p}} = \sum_{K+\sqrt{b}< t \leq K+\sqrt{b}+b}(K+\sqrt{b}+b-t)\hat{p}_t - \sum_{t > K+\sqrt{b}+b}(t-(K+\sqrt{b}+b))\hat{p}_t.$$ 
+    Then, by considering maps between the regions $[1,K+\sqrt{b}]$, $(K+\sqrt{b},K+\sqrt{b}+b]$ and $(K+\sqrt{b}+b,\infty)$, the bad maps are those from $[1,K+\sqrt{b}]$ to $(K+\sqrt{b},K+\sqrt{b}+b]$ (other maps are again digested by their contributions to the $EMD$, as we did in Lemma~\ref{lm:phat Ainf and p AK with EMD O1}). 
+
+    For maps $\mathcal{B}$ from $[1,K+\sqrt{b}]$ to $(K+\sqrt{b},K+\sqrt{b}+b]$ (elements in the optimal transport plan), since $\mathcal{B}$ has nothing to do with $t>K+\sqrt{b}+b$, we have $$\left. \text{diff}_p - \text{diff}_{\hat{p}}\right|_{\mathcal{B}} = \sum_{K+\sqrt{b}<t\leq K+\sqrt{b}+b}(K+\sqrt{b}+b-t)(p_t - \hat{p}_t).$$
+    
+    Let us first consider the set of bad maps $\mathcal{B}_1$ from $[1,K]$ to $(K+\sqrt{b},K+\sqrt{b}+b]$. Since the moving distance for such map is at least $\sqrt{b}$, the total mass moving by such bad maps is at most $O(\frac{EMD}{\sqrt{b}})$. Thus, 
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}} \right|_{\mathcal{B}_1} = \sum_{ K+\sqrt{b}<t \leq K+\sqrt{b}+b}(K+\sqrt{b}+b-t)\left. \epsilon_t \right|_{\mathcal{B}_1} \leq b \cdot \left. \sum_{ K+\sqrt{b}<t \leq K+\sqrt{b}+b} \epsilon_t \right|_{\mathcal{B}_1} \leq O(\sqrt{b} \cdot EMD),$$
+    where $\left. \epsilon_t \right|_{\mathcal{B}_1} = \left. p_t - \hat{p}_t \right|_{\mathcal{B}_1}$ is the mass change by all such bad maps in $\mathcal{B}_1$ at $t$ for any point $K+\sqrt{b}<t \leq K+\sqrt{b}+b$.
+
+    Then, let us consider the set of bad maps $\mathcal{B}_2$ from $(K,K+\sqrt{b}]$ to $(K+\sqrt{b},K+\sqrt{b}+b]$. We similarly define $\left. \epsilon_t \right|_{\mathcal{B}_2} = \left. p_t - \hat{p}_t \right|_{\mathcal{B}_2}$ as the mass change by all such bad maps in $\mathcal{B}_2$ at~$t$ for any point $K+\sqrt{b}<t \leq K+\sqrt{b}+b$.
+    Since we are considering bad maps of the form $\mathcal{B}_2$, we know that $\left. \sum_{ K+\sqrt{b}<t \leq K+\sqrt{b}+b} \epsilon_t \right|_{\mathcal{B}_2}$ is at most $\sum_{K<t \leq K+\sqrt{b}}\hat{p}_t$. Therefore, 
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}} \right|_{\mathcal{B}_2} = \sum_{ K+\sqrt{b}<t \leq K+\sqrt{b}+b}(K+\sqrt{b}+b-t)\left. \epsilon_t \right|_{\mathcal{B}_2} \leq b \left. \sum_{ K+\sqrt{b}<t \leq K+\sqrt{b}+b} \epsilon_t \right|_{\mathcal{B}_2} \leq b \sum_{K<t \leq K+\sqrt{b}}\hat{p}_t.$$
+    Again, this is bounded by $O(\sqrt{b})$ by taking $T=\sqrt{b}$ in Claim~\ref{claim:if AK is opt policy then K to K+T cannot have too much mass}.
+
+    Therefore, we finish the proof as required.
+\end{proof}
+
+Now, the only left case is when $A_{\hat{K}}$ is the optimal policy for $\hat{p}$ and $A_K$ is the optimal policy for $p$ for some finite $\hat{K}$ and $K$. In this case, we refer to the optimal policy for $\hat{p}$ as $A_{\hat{K}}$ to avoid any ambiguity. We need to show that by taking $ALG = A_{\hat{K}+\sqrt{b}}$, we have $\text{diff}_p \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$. This needs a long proof, as one will see that we have to use a combination of techniques in the previous lemmas.
+
+\begin{lemma}
+    \label{lm:phat is AKhat and p is AK root b loss}
+    Let $\hat{p}$ be the prediction and $p$ be the truth. Assume that the optimal policy for~$\hat{p}$ is $A_{\hat{K}}$ for some finite $\hat{K}$. Let $ALG = A_{\hat{K}+\sqrt{b}}$. If the optimal policy for $p$ is $A_K$ for some finite $K$, we have $\text{diff}_p = c(ALG_p) - c(OPT_p) \leq O(\sqrt{b} \max(EMD(\hat{p},p),1))$.
+\end{lemma}
+
+\begin{proof}
+    We want to show that $\text{diff}_p = c((A_{\hat{K}+\sqrt{b}})_p) - c((A_K)_p) \leq O(\sqrt{b})$. Consider $\text{diff}_{\hat{p}} = c((A_{\hat{K}+\sqrt{b}})_{\hat{p}}) - c((A_K)_{\hat{p}})$. Since $A_{\hat{K}}$ is the optimal policy for $\hat{p}$, we have $c((A_{\hat{K}})_{\hat{p}}) - c((A_K)_{\hat{p}}) \leq 0$. By Observation~\ref{obs:AK plus root b is not too bad than AK}, we have 
+    \[\text{diff}_{\hat{p}} = c((A_{\hat{K}+\sqrt{b}})_{\hat{p}}) - c((A_K)_{\hat{p}}) \leq c((A_{\hat{K}})_{\hat{p}}) + \sqrt{b}- c((A_K)_{\hat{p}}) \leq \sqrt{b}.\]
+    Now, we want to find the bad maps in an optimal transport plan. We write down
+    \[\text{diff}_{\hat{p}} = \left( \sum_{t \leq \hat{K}+\sqrt{b}} t \hat{p}_t + \sum_{t>\hat{K}+\sqrt{b}}(\hat{K}+\sqrt{b}+b)\hat{p}_t \right) - \left( \sum_{t \leq K} t \hat{p}_t + \sum_{t>K}(K+b)\hat{p}_t \right).\]
+    We separate into two cases by comparing $\hat{K}+\sqrt{b}$ and $K$.
+
+    \textbf{Case 1.} When $\hat{K}+\sqrt{b} < K$.
+
+    In this case, by some simple calculations, we have 
+    \begin{align*}
+    \text{diff}_{\hat{p}} =& \sum_{\hat{K}+\sqrt{b}< t \leq K}(\hat{K}+\sqrt{b}+b-t)\hat{p}_t - \sum_{t > K}(K-(\hat{K}+\sqrt{b}))\hat{p}_t\\
+    =& \sum_{t \leq \hat{K}+\sqrt{b}}(K-(\hat{K}+\sqrt{b}))\hat{p}_t + \sum_{\hat{K}+\sqrt{b}< t \leq K}(K+b-t)\hat{p}_t - (K-(\hat{K}+\sqrt{b})).
+    \end{align*}
+    By examining different kind of maps, one can check that there are two kinds of bad maps: either from $[1,\hat{K}+\sqrt{b}]$ to $(\hat{K}+\sqrt{b},K]$ (bad maps of the first kind $\mathcal{B}^1$), or from $(K,K+b]$ to $(\hat{K}+\sqrt{b},K]$ (bad maps of the second kind $\mathcal{B}^2$). We will analyze those bad maps of the first kind using the first expression of $\text{diff}_{\hat{p}}$ and analyze those bad maps of the second kind using the second expression in the above formula.
+
+    For the set of bad maps of the first kind which are from $[1,\hat{K}]$ to $(\hat{K}+\sqrt{b},K]$, we denote it as $\mathcal{B}^1_1$. We know that maps in $\mathcal{B}^1_1$ has nothing to do with $t>K$. Moreover, since the moving distance for such map is at least $\sqrt{b}$, the total mass moving by such bad maps is at most $O(\frac{EMD}{\sqrt{b}})$. Therefore,
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}}\right|_{\mathcal{B}^1_1} = \sum_{\hat{K}+\sqrt{b}< t \leq K}(\hat{K}+\sqrt{b}+b-t)\left.(p_t-\hat{p}_t) \right|_{\mathcal{B}^1_1} \leq b \cdot  \left. \sum_{ \hat{K}+\sqrt{b}<t \leq K} \epsilon_t \right|_{\mathcal{B}^1_1} \leq O(\sqrt{b}\cdot EMD),$$
+    where $\left. \epsilon_t \right|_{\mathcal{B}^1_1} = \left. p_t - \hat{p}_t \right|_{\mathcal{B}^1_1}$ is the mass change by all such bad maps in $\mathcal{B}^1_1$ at $t$ for any point $\hat{K}+\sqrt{b}<t \leq K$.
+
+    Then, let us consider the set of bad maps $\mathcal{B}^1_2$ from $(\hat{K},\hat{K}+\sqrt{b}]$ to $(\hat{K}+\sqrt{b},K]$. We similarly define $\left. \epsilon_t \right|_{\mathcal{B}^1_2} = \left. p_t - \hat{p}_t \right|_{\mathcal{B}^1_2}$ as the mass change by all such bad maps in $\mathcal{B}^1_2$ at~$t$ for any point $\hat{K}+\sqrt{b}<t \leq K$.
+
+    Since we are considering bad maps of the form $\mathcal{B}^1_2$, we know that $\left. \sum_{ \hat{K}+\sqrt{b}<t \leq K} \epsilon_t \right|_{\mathcal{B}^1_2}$ is at most $\sum_{\hat{K}<t \leq \hat{K}+\sqrt{b}}\hat{p}_t$. Therefore, 
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}}\right|_{\mathcal{B}^1_2} = \sum_{\hat{K}+\sqrt{b}< t \leq K}(\hat{K}+\sqrt{b}+b-t)\left. \epsilon_t \right|_{\mathcal{B}^1_2} \leq b \cdot  \left. \sum_{ \hat{K}+\sqrt{b}<t \leq K} \epsilon_t \right|_{\mathcal{B}^1_2} \leq b \sum_{\hat{K}<t \leq \hat{K}+\sqrt{b}}\hat{p}_t.$$
+    Again, this is bounded by $O(\sqrt{b})$ by taking $T=\sqrt{b}$ in Claim~\ref{claim:if AK is opt policy then K to K+T cannot have too much mass}.
+
+
+
+    For the set of bad maps of the second kind which are from $(K+\sqrt{b},K+b]$ to $(\hat{K}+\sqrt{b},K]$, we denote it as $\mathcal{B}^2_1$. We know that maps in $\mathcal{B}^2_1$ has nothing to do with $t<\hat{K}+\sqrt{b}$. Moreover, since the moving distance for such map is at least $\sqrt{b}$, the total mass moving by such bad maps is at most $O(\frac{EMD}{\sqrt{b}})$. Therefore,
+    \begin{align*}
+    \left. \text{diff}_p - \text{diff}_{\hat{p}}\right|_{\mathcal{B}^2_1} &= \sum_{\hat{K} + \sqrt{b}< t \leq K}(K+b-t)\left.(p_t-\hat{p}_t) \right|_{\mathcal{B}^2_1} \\
+    &\leq \sum_{\hat{K} + \sqrt{b}< t \leq K}(K-t)\left.\epsilon_t \right|_{\mathcal{B}^2_1} + \sum_{\hat{K} + \sqrt{b}< t \leq K}b\left.\epsilon_t \right|_{\mathcal{B}^2_1} \leq O(\sqrt{b}\cdot EMD)
+    \end{align*}
+    where $\left. \epsilon_t \right|_{\mathcal{B}^2_1} = \left. p_t - \hat{p}_t \right|_{\mathcal{B}^2_1}$ is the mass change by all such bad maps in $\mathcal{B}^2_1$ at $t$ for any point $\hat{K} + \sqrt{b}< t \leq K$. The last inequality holds since $\sum_{\hat{K} + \sqrt{b}< t \leq K}(K-t)\left.\epsilon_t \right|_{\mathcal{B}^2_1}$ is bounded by $EMD(\hat{p},p)$ and $\sum_{\hat{K} + \sqrt{b}< t \leq K}b\left.\epsilon_t \right|_{\mathcal{B}^2_1} \leq O(b \cdot \frac{EMD}{\sqrt{b}}) = O(\sqrt{b} \cdot EMD)$.
+
+    Then, let us consider the set of bad maps $\mathcal{B}^2_2$ from $(K,K+\sqrt{b}]$ to $(\hat{K}+\sqrt{b},K]$. This is a bit complicated. First, recall that in $\hat{p}$, $A_{\hat{K}}$ is the optimal policy, so $c((A_{\hat{K}})_{\hat{p}}) \leq c((A_{K+\sqrt{b}})_{\hat{p}})$ (note that in case 1, $\hat{K}<K+\sqrt{b}$). We have
+    \begin{align}
+    & c((A_{\hat{K}})_{\hat{p}}) \leq c((A_{K+\sqrt{b}})_{\hat{p}}) \notag \\
+    \iff & \sum_{t \leq  K+\sqrt{b}} (K+\sqrt{b}+b-t)\hat{p}_t \leq (K+\sqrt{b}-\hat{K}) +  \sum_{t \leq \hat{K}}(\hat{K}+b -t )\hat{p}_t \notag \\
+    \iff & \sum_{K<t \leq  K+\sqrt{b}} (K+\sqrt{b}+b-t)\hat{p}_t \leq (K+\sqrt{b}-\hat{K}) +  \sum_{t \leq \hat{K}}(\hat{K}+b -t )\hat{p}_t - \sum_{t \leq  K} (K+\sqrt{b}+b-t)\hat{p}_t. \quad \label{eq:ast} \tag{\(\ast\)}
+    \end{align}
+    We similarly define $\left. \epsilon_t \right|_{\mathcal{B}^2_2} = \left. p_t - \hat{p}_t \right|_{\mathcal{B}^2_2}$ as the mass change by all such bad maps in $\mathcal{B}^2_2$ at~$t$ for any point $\hat{K}+\sqrt{b}<t \leq K$.
+
+    Since we are considering bad maps of the form $\mathcal{B}^2_2$, we know that $\left. \sum_{ \hat{K}+\sqrt{b}<t \leq K} \epsilon_t \right|_{\mathcal{B}^2_2}$ is at most $\sum_{K<t \leq K+\sqrt{b}}\hat{p}_t$. Therefore, 
+    $$\left. \text{diff}_p - \text{diff}_{\hat{p}}\right|_{\mathcal{B}^2_2} = \sum_{\hat{K} + \sqrt{b}< t \leq K}(K+b-t)\left.\epsilon_t \right|_{\mathcal{B}^2_2} \leq \sum_{\hat{K} + \sqrt{b}< t \leq K}(K-t)\left.\epsilon_t \right|_{\mathcal{B}^2_2} + \sum_{\hat{K} + \sqrt{b}< t \leq K}b\left.\epsilon_t \right|_{\mathcal{B}^2_2}.$$
+    Note that term $\sum_{\hat{K} + \sqrt{b}< t \leq K}(K-t)\left.\epsilon_t \right|_{\mathcal{B}^2_2}$ is bounded by $EMD(\hat{p},p)$ and $\sum_{\hat{K} + \sqrt{b}< t \leq K}b\left.\epsilon_t \right|_{\mathcal{B}^2_2}$ is bounded by $b\sum_{K<t \leq K+\sqrt{b}}\hat{p}_t$. Thus, to show that $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b} \cdot \max(EMD,1)) - \text{diff}_{\hat{p}}$, it suffices to show that $b\sum_{K<t \leq K+\sqrt{b}}\hat{p}_t \leq O(\sqrt{b}) - \text{diff}_{\hat{p}}$.
+
+    Note that $b\sum_{K<t \leq K+\sqrt{b}}\hat{p}_t$ is less than the left hand side of~\eqref{eq:ast}, hence it suffices to show that
+    \[(K+\sqrt{b}-\hat{K}) +  \sum_{t \leq \hat{K}}(\hat{K}+b -t )\hat{p}_t - \sum_{t \leq  K} (K+\sqrt{b}+b-t)\hat{p}_t \leq O(\sqrt{b}) - \text{diff}_{\hat{p}}.\]
+    By writing $\text{diff}_{\hat{p}}=\sum_{t \leq \hat{K}+\sqrt{b}}(K-(\hat{K}+\sqrt{b}))\hat{p}_t + \sum_{\hat{K}+\sqrt{b}< t \leq K}(K+b-t)\hat{p}_t - (K-(\hat{K}+\sqrt{b}))$, it suffices to show that (rearranging to make both sides containing positive terms only)
+    \[\sum_{t \leq \hat{K}}(\hat{K}+b -t )\hat{p}_t + \sum_{t \leq \hat{K}+\sqrt{b}}(K-(\hat{K}+\sqrt{b}))\hat{p}_t + \sum_{\hat{K}+\sqrt{b}< t \leq K}(K+b-t)\hat{p}_t \leq O(\sqrt{b}) + \sum_{t \leq  K} (K+\sqrt{b}+b-t)\hat{p}_t. \quad \label{eq:chap} \tag{\(\S\)} \]
+    Now, compare both sides of~\eqref{eq:chap} for all $t$.
+
+    For $t \leq \hat{K}$, $LHS$ of~\eqref{eq:chap} is $(\hat{K}+b-t+K-(\hat{K}+\sqrt{b}))\hat{p}_t = (b+K-t-\sqrt{b})\hat{p}_t$. $RHS$ of~\eqref{eq:chap} is $(K+\sqrt{b}+b-t)\hat{p}_t$. So, $LHS \leq RHS$.
+
+    For $\hat{K}<t \leq \hat{K}+\sqrt{b}$, $LHS$ of~\eqref{eq:chap} is $(K-(\hat{K}+\sqrt{b}))\hat{p}_t$. $RHS$ of~\eqref{eq:chap} is $(K+\sqrt{b}+b-t)\hat{p}_t$. So, $LHS \leq RHS$ since $t \leq \hat{K}+\sqrt{b}$.
+
+    For $\hat{K}+\sqrt{b}<t \leq K$, $LHS$ of~\eqref{eq:chap} is $(K+b-t)\hat{p}_t$. $RHS$ of~\eqref{eq:chap} is $(K+\sqrt{b}+b-t)\hat{p}_t$. So, $LHS \leq RHS$.
+
+    Therefore,~\eqref{eq:chap} holds. We proved that $\text{diff}_p \leq O(\sqrt{b} \cdot \max(EMD,1))$ and finish the proof of Case 1.
+
+    \textbf{Case 2.} When $K < \hat{K} + \sqrt{b}$. 
+
+    We will briefly give the short proof here as the full procedure is similar to Case 1.
+
+    In this case, by some simple calculations, we have 
+    \begin{align*}
+    \text{diff}_{\hat{p}} =& \sum_{t> \hat{K}+\sqrt{b}}(\hat{K}+\sqrt{b}-K)\hat{p}_t - \sum_{K < t \leq \hat{K}+\sqrt{b}}(K+b-t)\hat{p}_t\\
+    =& (\hat{K}+\sqrt{b}-K) - \sum_{t \leq K}(\hat{K}+\sqrt{b}-K)\hat{p}_t - \sum_{K<t \leq \hat{K}+\sqrt{b}}(\hat{K}+\sqrt{b}+b-t)\hat{p}_t.
+    \end{align*}
+    By examining different kind of maps, one can check that there are two kinds of bad maps: either from $(\hat{K},\hat{K}+\sqrt{b}]$ to $[1,K]$ (bad maps of the third kind $\mathcal{B}^3$), or from $(\hat{K},\hat{K}+\sqrt{b}]$ to $(\hat{K}+\sqrt{b},\hat{K}+\sqrt{b}+b]$ (bad maps of the fourth kind $\mathcal{B}^4$). We will analyze those bad maps of the third kind using the first expression of $\text{diff}_{\hat{p}}$ and analyze those bad maps of the fourth kind using the second expression in the above formula.
+
+    As always, we can define $\mathcal{B}^3_1$ and $\mathcal{B}^4_1$ respectively for those cases since the moving distance is at least $\sqrt{b}$ by these bad maps. We know that the total mass moving by such bad maps is at most $O(\frac{EMD}{\sqrt{b}})$, thus we have the $O(\sqrt{b} \cdot EMD)$ bound. 
+
+    For those maps with a moving distance less than $\sqrt{b}$ by bad maps, we usually denote them as $\mathcal{B}^3_2$ and $\mathcal{B}^4_2$ in previous arguments. When writing down the expression $\text{diff}_p - \text{diff}_{\hat{p}}$ caused by $\mathcal{B}^3_2$ and $\mathcal{B}^4_2$, bad maps of the form $\mathcal{B}^4_2$ lie in the easier case. One can again use Claim~\ref{claim:if AK is opt policy then K to K+T cannot have too much mass} to get the required $O(\sqrt{b} \cdot EMD)$ bound, by taking $T=\sqrt{b}$. As for bad maps in $\mathcal{B}^3_2$, we consider $c((A_{\hat{K}})_{\hat{p}}) \leq c((A_{K+\sqrt{b}})_{\hat{p}})$. Then~\eqref{eq:ast} holds in exactly the same way. Then, using~\eqref{eq:ast} and $b\sum_{K<t \leq K+\sqrt{b}} \hat{p}_t$ as a bridge, we can write down the similar form as~\eqref{eq:chap}. Finally, we can conclude that $\text{diff}_p - \text{diff}_{\hat{p}} \leq O(\sqrt{b} \cdot \max(EMD,1)) -\text{diff}_{\hat{p}}$. This finishes the proof of Case 2 (hence the lemma).
+\end{proof}
+
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+  Theorem~\ref{thm:main} follows directly from the combination of Lemma~\ref{lm:phat Ainf and p AK with EMD O1} to Lemma~\ref{lm:phat is AKhat and p is AK root b loss}.
+\end{proof}

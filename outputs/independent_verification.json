@@ -1,0 +1,156 @@
+{
+  "paper": "h8NydU966G",
+  "claims": [
+    {
+      "id": "C1",
+      "outcome": "verified",
+      "finite_tail_lemma": {
+        "distribution_pairs": 15876,
+        "cells": 238140,
+        "violations": 0,
+        "minimum_slack": "0"
+      },
+      "finite_algorithm_sweep": {
+        "cells": 79380,
+        "prediction_sensitive_max_ratio": 1.5,
+        "robust_max_ratio": 0.7213475204444817,
+        "truncation_inequality_failures": 0,
+        "tail_chain_failures": 0,
+        "maximum_loss": 15.0
+      }
+    },
+    {
+      "id": "C2",
+      "outcome": "verified",
+      "hard_family": {
+        "rows": [
+          {
+            "b": 16,
+            "cutoff": 23,
+            "u": 11,
+            "threshold": 15,
+            "consistency_loss": 0.7085548183545279,
+            "consistency_over_sqrt_b": 0.17713870458863198,
+            "robustness_loss": 15.0,
+            "robustness_over_b_log_b": 0.3381316502083508,
+            "quantile_valid": true
+          },
+          {
+            "b": 64,
+            "cutoff": 134,
+            "u": 66,
+            "threshold": 74,
+            "consistency_loss": 2.5991482881074948,
+            "consistency_over_sqrt_b": 0.32489353601343685,
+            "robustness_loss": 74.0,
+            "robustness_over_b_log_b": 0.27801935683797735,
+            "quantile_valid": true
+          },
+          {
+            "b": 256,
+            "cutoff": 710,
+            "u": 354,
+            "threshold": 370,
+            "consistency_loss": 6.540673918929264,
+            "consistency_over_sqrt_b": 0.408792119933079,
+            "robustness_loss": 370.0,
+            "robustness_over_b_log_b": 0.26064314703560376,
+            "quantile_valid": true
+          },
+          {
+            "b": 1024,
+            "cutoff": 3549,
+            "u": 1773,
+            "threshold": 1805,
+            "consistency_loss": 14.52502504118761,
+            "consistency_over_sqrt_b": 0.4539070325371128,
+            "robustness_loss": 1805.0,
+            "robustness_over_b_log_b": 0.25430317859419715,
+            "quantile_valid": true
+          },
+          {
+            "b": 4096,
+            "cutoff": 17035,
+            "u": 8516,
+            "threshold": 8580,
+            "consistency_loss": 30.505888138885243,
+            "consistency_over_sqrt_b": 0.47665450217008193,
+            "robustness_loss": 8580.0,
+            "robustness_over_b_log_b": 0.25183763531142794,
+            "quantile_valid": true
+          },
+          {
+            "b": 16384,
+            "cutoff": 79496,
+            "u": 39746,
+            "threshold": 39874,
+            "consistency_loss": 62.50345857806913,
+            "consistency_over_sqrt_b": 0.48830827014116507,
+            "robustness_loss": 39874.0,
+            "robustness_over_b_log_b": 0.2507935532069899,
+            "quantile_valid": true
+          },
+          {
+            "b": 65536,
+            "cutoff": 363409,
+            "u": 181702,
+            "threshold": 181958,
+            "consistency_loss": 126.5024263949367,
+            "consistency_over_sqrt_b": 0.4941501031052215,
+            "robustness_loss": 181958.0,
+            "robustness_over_b_log_b": 0.25034895348555947,
+            "quantile_valid": true
+          },
+          {
+            "b": 262144,
+            "cutoff": 1635340,
+            "u": 817667,
+            "threshold": 818179,
+            "consistency_loss": 254.50112879829925,
+            "consistency_over_sqrt_b": 0.4970725171841782,
+            "robustness_loss": 818179.0,
+            "robustness_over_b_log_b": 0.2501557214227234,
+            "quantile_valid": true
+          },
+          {
+            "b": 1048576,
+            "cutoff": 7268175,
+            "u": 3634085,
+            "threshold": 3635109,
+            "consistency_loss": 510.50003060942413,
+            "consistency_over_sqrt_b": 0.49853518614201575,
+            "robustness_loss": 3635109.0,
+            "robustness_over_b_log_b": 0.25007027279810135,
+            "quantile_valid": true
+          }
+        ],
+        "all_quantiles_valid": true,
+        "consistency_exponent_last_five": 0.5077583472885169,
+        "robustness_exponent_vs_b_log_b_last_five": 0.998898100975187
+      }
+    },
+    {
+      "id": "C3",
+      "outcome": "verified",
+      "prediction_error_independence": {
+        "source_khat_is_infinity": true,
+        "source_u": 0,
+        "strict_u": 255,
+        "source_threshold": 16,
+        "strict_mutation_threshold": 271,
+        "thresholds_by_truth": {
+          "same": 16,
+          "short": 16,
+          "boundary": 16,
+          "far": 16
+        },
+        "eta_aware_mutation_thresholds": {
+          "same": 16,
+          "short": 32,
+          "boundary": 256,
+          "far": 16777217
+        }
+      }
+    }
+  ]
+}

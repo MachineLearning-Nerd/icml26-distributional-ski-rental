@@ -1,0 +1,135 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The paradigm of algorithms with predictions has emerged as an important framework for enhancing decision-making under uncertainty, making it possible to combine the benefits of machine learning (ML) with traditional worst-case algorithmic guarantees. The goal is to use advice (presumably from an ML model) in a way that allows us to approach optimal decisions when this advice is accurate (known as a \emph{consistency} guarantee), but also allows us to fall back on worst-case guarantees when the advice is inaccurate (known as a \emph{robustness} guarantee).  This allows us to simultaneously get the benefits of ML (extremely good algorithms when the learning accurately reflects the input) and the benefits of traditional algorithms (worst-case performance) without suffering from the downsides of ML (poor performance when the input is dramatically different from the past) or the downsides of traditional algorithms (weak average-case performance due to emphasis on the worst-case).  
+
+The ski rental problem stands as a cornerstone of online algorithms, epitomizing the fundamental rent-or-buy dilemma where an agent must balance per-use costs against irreversible investments without knowledge of the problem horizon. The total number of ski days $T$ is unknown to the skier, and every day the skier must either rent skis (for a cost of $1$) or buy skis (for a cost of $b > 1$).  If they buy skis, then they no longer have to rent, since they now own.  Clearly if the number of ski days $T$ is at least $b$ then buying at the beginning of the season is optimal, while if the $T < b$ then renting every day is optimal.  But without knowing $T$, what should we do?  A classical result of \citet{Karlin1986CompetitiveSC} is that the optimal deterministic strategy achieves a competitive ratio of 2 by renting until day~$b-1$ and then buying (i.e., this strategy never pays more than twice the optimal strategy knowing $T$).  
+
+Due to its fundamental nature and importance, ski rental was one of the first settings to be looked at in the context of predictions: \citet{kumar2024improvingonlinealgorithmsml} showed how to use a prediction $\hat T$ of the skiing duration $T$ in a way that performs well when the prediction is accurate, but still has reasonable worst-case bounds if the prediction is inaccurate.
+An important feature of \citet{kumar2024improvingonlinealgorithmsml}, as well as most (but not all) other work on algorithms with predictions, is that the prediction is fundamentally a \emph{point}: we are given a prediction of the number of days that we will be skiing.  But predictions from ML models are inherently stochastic, and moreover since we want to do well in settings where we expect ML to do well (i.e., when the future looks like the past), we might expect $T$ to also be drawn from a distribution (hopefully one that is related to the past empirical distribution).  So we might expect both our prediction and the truth to really be \emph{distributional}.\footnote{Clearly a point distribution is a distribution, and so distributional predictions and truths strictly generalize the traditional point case.} While one could of course sample or take the MLE of the distribution to turn it into a point, it is not hard to see that this can be extremely lossy.  Consider a bimodal distribution with one mode at time 2 and one mode at time $2b$.  Clearly collapsing this distribution to any point will result in a prediction that is quite inaccurate. 
+
+Motivated by this thought process, we study ski rental with \emph{distributional predictions}: the true value $T$ is drawn from some distribution $p$, and we are given a prediction $\hat p$.  Our goal is, as always, to achieve good performance when $\hat p$ and $p$ are close (consistency) while still providing worst-case guarantees when $p$ and $\hat p$ are arbitrarily far apart.  We discuss our results in Section~\ref{sec:our results and contributions}, but at a high level, we are able to do exactly that: we design an algorithm which uses a distributional prediction in an essentially optimal way to achieve small additive loss when $p$ and $\hat p$ are close, while also being robust to incorrect predictions. 
+
+We note that we are not the first to consider such a setting.  Most notably, ski rental with some type of distributional prediction was also studied by \citet{diakonikolas2021learning} and by \citet{besbes}.  We discuss these and other related work in Section~\ref{subsec:related work}, but at a high level, \citet{diakonikolas2021learning} focuses on the sample-complexity question of actually learning the true distribution, while \citet{besbes} looks at almost the same setting as us except from a robust optimization point of view: they assume that they know the distance between $p$ and $\hat p$ (or at least a good bound on it).  This enables them to get significantly stronger upper bounds, but is in contrast to essentially all other work in the algorithms with predictions framework, which does not typically assume such knowledge.  Moreover, they explicitly raise our setting as an open question: ``A natural question would be to understand the best achievable performance without knowledge of $\epsilon$ [distance between $p$ and $\hat p$]'' ~\cite{besbes}.
+
+
+
+\section{Our results and contributions}
+\label{sec:our results and contributions}
+
+\subsection{Problem setup and definitions}
+Before we can state our results, we need to introduce the problem setup and some basic definitions more formally.  We normalize so the rental cost is one unit cost per day and the buying cost is $b$. An adversary chooses a distribution $p$ over $[N]$ for some large finite value $N$, and the total number of ski days $T$ is drawn from $p$.  We are given as a prediction a distribution $\hat p$ over $[N]$, and our goal is to design an algorithm (or policy) which outputs a decision for every day $i$ whether to rent or buy (assuming that we are still skiing on day $i$).  Note that once the policy decides to buy, there are no longer any decisions for it to make.  A policy can be deterministic or randomized; our algorithms will be deterministic, but our lower bounds will apply to both randomized and deterministic policies.  Clearly any deterministic policy is of the form ``rent for $K$ days, then buy on day $K+1$", and we denote such a policy as $A_K$. To simplify notation, we also let $A_0$ denote the policy of ``buy at the beginning'' (i.e., after $0$ days) and we let $A_\infty$ denote the policy of renting forever (until the process ends). 
+
+Given a prediction $\hat{p}$ with some unknown truth $p$, we design an algorithm $ALG(\hat{p})$. We use the notation $ALG_p(\hat{p})$ to refer to running algorithm $ALG$ obtained from $\hat{p}$ when the true distribution is $p$. If the true number of ski days is $T$ (possibly drawn from a distribution $p$), we abuse notation and let $ALG_T(\hat p)$ denote running the algorithm with true value $T$.  Since our algorithm naturally depends on $\hat{p}$, we use $ALG$ or $ALG(\hat{p})$ interchangeably. Let $c(\cdot)$ be the (expected) cost function, so $c(ALG_T)$ is the expected cost for $ALG$ with a point truth $T$ and $c(ALG_p) = \mathbb{E}_{T \sim p}[c(ALG_T)]$. Moreover, each policy has a corresponding expected cost:
+\begin{equation*} \label{eq:cost} 
+\begin{aligned}
+c((A_K)_p)
+&= \sum_{t \le K} t\,p_t \;+\; \sum_{t > K} (K+b)\,p_t,
+\qquad &&\text{for } K \ge 0, \\
+c((A_\infty)_p)
+&= \sum_{t} t\,p_t.
+\end{aligned}
+\end{equation*}
+The optimal policy for $p$ (which we denote by $OPT_p$) is the policy that minimizes this expected cost, i.e., $c(OPT_p) = \arg \min_{K \in \{0, \dots, N\} \cup \{\infty\}} c((A_K)_p)$. 
+
+In order to claim that our algorithm does well when $\hat p$ is ``close'' to $p$, we need some definition of distance between distributions.  We will use Earth Mover's distance ($EMD$) (also known as the \emph{Wasserstein-1 metric}) to measure the error between the predicted distribution and the truth. This distance is formally defined as $EMD(P, Q) = \inf_{\gamma \in \Pi(P, Q)} \mathbb{E}_{(x, y) \sim \gamma}[|x - y|]$ where $\Pi(P, Q)$ denotes the set of joint distributions (or couplings) with marginals $P$ and $Q$.  Informally, this is equivalent to the minimum total mass movement necessary to turn distribution $P$ into $Q$.  Slightly more carefully, a \emph{transport plan} $\pi(x, y)$ specifies the amount of mass transported from point $x$ to point $y$ (with $\pi(x,y) \geq 0$ for all $x,y$), and satisfies the marginal constraints
+$\sum_y \pi(x, y) = P(x)$ and $ \sum_x \pi(x, y) = Q(y)$.  The \emph{optimal transport plan} is the plan that minimizes $\sum_{x,y} \pi(x,y) |x-y|$, and this minimum cost is $EMD(P,Q)$.   
+For brevity, we also use $EMD$ when the chosen distributions are clear from context.
+
+
+\paragraph{Benchmark: expected optimal policy cost.}  Our aim is to design an algorithm $ALG$ with small additive loss compared to the optimal policy for $p$.  More carefully, the \emph{additive loss} of an algorithm $ALG$ on distribution $p$ is $\text{diff}_p \coloneqq c(ALG_p) - c(OPT_p)$, and we want to minimize this quantity.
+
+Note that we choose our benchmark to be the expected cost of the optimal policy, rather than the optimum in hindsight.  If $p$ is a point distribution (i.e., the adversary just selects a fixed number of days $T$) then these are the same thing, but in general they can be quite different.  While it may not be clear a priori which is the better benchmark, since any algorithm is actually a policy, a ``fair'' comparison is to the best policy; this allows us to quantify the loss from an inaccurate prediction, rather than combining the loss from an inaccurate prediction with inherent loss due to stochasticity.  
+
+Moreover, it is not hard to show that it is simply not possible to achieve good performance compared to the optimum in hindsight: our additive error must be $\Omega(b)$. Consider the following example: $p_{\frac{b}{2}}=\frac{1}{2}$ and $p_{2b}=\frac{1}{2}$. Then it is not hard to see that both $A_0$ and $A_{b/2}$ are the optimal policies for $p$, each of which has expected cost $b$. On the other hand, the expected optimum in hindsight has cost $\frac{1}{2} \cdot \frac{b}{2} + \frac{1}{2} \cdot b = \frac{3}{4}b$. So even if we assume that we know $p$ precisely, our additive loss compared to the optimum in hindsight is $\Omega(b)$.  By using the optimal policy as our baseline (a more fair comparison) we will be able to get additive loss that is sublinear in $b$.  
+
+
+\subsection{Our results} \label{sec:results}
+
+\paragraph{Main upper bound.}  We begin with our main result.
+
+\begin{restatable}{thm}{newtheorem} \label{thm:new theorem}
+    There is an algorithm $ALG$ which takes as input a distributional prediction $\hat p$ and has
+    \[c(ALG_p) - c(OPT_p) \leq O\left( \min\left( \sqrt{b}\cdot \max\left(EMD(\hat p, p), 1\right),\ b\log b\right) \right).\]
+\end{restatable}
+
+To interpret this bound, first consider the case where $p = \hat p$.  In this case the additive loss $c(ALG_p) - c(OPT_p)$ will be $O(\sqrt{b})$.  So our algorithm has \emph{consistency} of $O(\sqrt{b})$.  As the prediction gets increasingly inaccurate (i.e., $EMD(\hat p, p)$ grows), our algorithm has additive loss that stays at $O(\sqrt{b})$ until $EMD(\hat p, p) > 1$, and then grows linearly as $O(\sqrt{b} \cdot EMD(\hat p, p))$ until $EMD(\hat p, p)$ reaches $\Theta(\sqrt{b} \log b)$, after which the loss stays at $O(b \log b)$.  
+
+The most obviously comparable previous work is \citet{besbes}.  In their setting they assume that $EMD(\hat p, p)$ is known to the algorithm, although of course $p$ itself is not known.  In this setting they achieve an improved upper bound of $O\left(\sqrt{b \cdot EMD(\hat p, p)} + EMD(\hat p, p)\right)$.  Moreover, in their setting robustness becomes essentially trivial: we can always get worst-case additive loss of $b$ by just checking whether the guarantee of the algorithm is larger than $b$, and if it is, switching the algorithm to just buy on the first day.  In our setting, though, robustness becomes a key challenge.  It is obviously important, since if we just run a non-robust algorithm blindly without knowing $EMD(\hat p, p)$ we might incur arbitrarily large additive loss.  And yet it is not obvious how to achieve robustness without harming performance in the low $EMD(\hat p, p)$ regime (consistency).
+
+To prove Theorem~\ref{thm:new theorem}, we first design a non-robust base algorithm which has our desired loss except without robustness, i.e., it has loss $O\left( \min\left( \sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right)\right)\right)$.  Our algorithm is quite simple: we compute the optimal policy for the prediction $\hat p$, and then delay buying by an additional $\sqrt{b}$ days.  It turns out that, even though \citet{besbes} focused on the fundamentally different setting of known $EMD(\hat p, p)$ and do not provide any lemmas or theorems which directly apply to this algorithm, our bound can be derived from equation (E-28) in the online appendix of their paper.  Nevertheless, we believe that our analysis is somewhat more direct and intuitive since it directly uses properties of the optimal transport plan, so we include it for completeness (and since it was developed independently).  We give our full proof of this property in Appendix~\ref{appendix:analysis of the main algorithm}.
+
+With the base algorithm in hand, the question is now how to achieve robustness.  We do this by adding a truncation condition based on the tail probability mass in $\hat p$.  Slightly more carefully, we compute the first day $U$ where the total probability mass in $\hat p$ on days larger than $U$ is at most $1/\sqrt{b}$.  If $U$ is smaller than the optimal policy threshold $\hat K$ for $\hat p$, then we switch to instead use $A_{U + \sqrt{b}}$ (buy on day $U + \sqrt{b}+1$) rather than use $A_{\hat K + \sqrt{b}}$ (buy on day $\hat K + \sqrt{b}+1$) as our base algorithm would.  
+
+We need to show that this modification does not increase the loss when $EMD(\hat p, p)$ is small, and also need to show that it actually implies robustness of $O(b \log b)$.  For the former, this boils down to showing that if the truncation actually modifies the algorithm, it must be because the optimal buying time for $\hat p$ occurs when there is very little probability mass left, and thus this is a low-probability event that only affect the loss by a constant factor.  While this is only ``low probability'' with respect to the prediction $\hat p$ and not the truth $p$, we only need to apply this to the setting when $EMD(\hat p, p) \leq \sqrt{b} \log b$, and so we can translate between $p$ and $\hat p$ without too much extra loss.  
+
+For the latter, if $\hat K<U$, by the fact that the predicted tail mass at time $\hat K$ is still non-negligible (because $U$ has not been reached yet), and arguing that the optimality of $A_{\hat{K}}$ forces the predicted tail mass to decrease quickly enough, we are able to show that $\hat K$ cannot be too large, which is itself enough to imply the desired robustness. If $U \leq \hat K$, the optimality of buying at $\hat K$ imposes a strong structural constraint on how the predicted tail can behave: intuitively, to keep $\hat K$ optimal, the predicted tail must lose some fraction of its remaining mass over a bounded time window. Thus, we are able to show that the time required for the predicted tail to drop to the level defining $U$ is at most $O(b\log b)$. The full proof of Theorem~\ref{thm:new theorem} can be found in Section~\ref{sec: new algorithm}.
+
+
+\paragraph{Further robustness.}
+Another interpretation of Theorem~\ref{thm:new theorem} is that we can get robustness of $O(b \log b)$ \emph{for free}.  We prove later that even if one does not care about robustness, no algorithm can have additive loss better than our $O\left( \sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right) \right)$ (with some caveats; see Theorem~\ref{thm:lower bound for the multiplicative sqrt{b}EMD}).  We manage to achieve this bound while also achieving robustness $O(b \log b)$.
+
+But what if we want a worst-case guarantee below $O(b \log b)$? To obtain a stronger robustness guarantee, we introduce an additional robustification step that interpolates between Algorithm~\ref{alg:new algorithm} and the classical worst-case algorithm; this interpolation improves worst-case performance, but may come at the cost of degraded performance in the low-error regime. To do this, we follow the lead of \citet{kumar2024improvingonlinealgorithmsml} in the point prediction setting: we design an algorithm which takes an additional parameter $\lambda$ corresponding to how much we ``trust'' our prediction, and allows us to smoothly interpolate between the fully trusted setting ($\lambda = 0$) and the fully untrusted setting ($\lambda = 1$).  
+
+
+\begin{restatable}{thm}{newrobust}
+    \label{thm: new robustification}
+    There is an algorithm $ALG$ which takes as input a parameter $\lambda \in [0,1]$ and a distributional prediction $\hat p$, and has expected cost
+    \[c(ALG_p) \leq \min \left\{ (1+\lambda)\left(c(OPT_p)+\mathcal{B}_{\hat{p}, p} \right) , \left(1+\frac{1}{\lambda}\right)c(OPT_p)\right\},\]
+    where $\mathcal{B}_{\hat{p},p} = O\left( \min\left(   \sqrt{b} \max\left(EMD(\hat{p},p),1\right),  b \log b \right)\right)$.
+\end{restatable}
+
+Note that when $\lambda = 0$ the minimum is achieved by the first term and exactly matches the bound of Theorem~\ref{thm:new theorem}, while if $\lambda = 1$ then the minimum is achieved by the second term and the bound can be rewritten as $c(ALG_p) / c(OPT_p) \leq 2$, generalizing and recovering the classical $2$-competitive algorithm.  Choosing $\lambda \in (0,1)$ allows us to interpolate smoothly between these extremes.
+
+
+
+This algorithm, as well as the proof of Theorem~\ref{thm: new robustification} can be found in Appendix~\ref{sec:further robustification}. 
+The main idea behind this further robustification step is to ``push'' our prediction-based algorithm closer to the traditional worst-case algorithm (renting until day $b-1$ before buying): while the algorithm from Theorem~\ref{thm:new theorem} suggests buying on day $D$, one can potentially delay the purchase to a later time $D^\prime <b$ if $D<b$, or make an early purchase on a preceding day $D^{\prime \prime} >b$ if $D>b$. 
+
+
+\paragraph{Lower bounds.}  
+
+Despite the complexity of the upper bound in Theorem~\ref{thm:new theorem}, we provide a collection of lower bounds showing that it is tight in a variety of ways.  To begin, recall that \citet{kumar2024improvingonlinealgorithmsml} studied the ski rental problem in the setting where the true number of ski days is $T$ and we are given a prediction $\hat T$.  One of their first results is an algorithm which has cost $OPT + |T - \hat T|$, or in other words, $OPT$ plus the error of the prediction.  With that result in mind, a natural goal would be for us to generalize this to the distributional case and give an algorithm with expected cost at most $OPT_p + EMD(\hat p, p)$.  Unfortunately, as our first lower bound, we show that this is impossible (the proof of this theorem can be found in Appendix~\ref{appendix:proof_lowerbound_3}).  
+
+\begin{restatable}{thm}{additivelowerbound}
+    \label{thm:lower bound any sublinear in b}
+    Let $\hat{p}$ be the distributional prediction and $p$ be the unknown true distribution. For any $0<\epsilon \leq 1$, there is no algorithm (deterministic or randomized) $ALG$ such that 
+    \[c(ALG_p) - c(OPT_p) \leq O(EMD(\hat{p},p))+O(b^{1-\epsilon}).\]
+\end{restatable}
+
+There is, however, a limited setting in which we can get around this lower bound: if $p$ is a point distribution and $\hat p$ is an arbitrary distribution, then simply by sampling a prediction $\hat T$ from $\hat p$ and using that in the algorithm of~\citet{kumar2024improvingonlinealgorithmsml} achieves additive loss of $O(EMD(\hat p, p))$.  In Appendix~\ref{appendix:point_truth} we give a slight improvement by designing a deterministic version of this algorithm.
+
+Theorem~\ref{thm:lower bound any sublinear in b} implies that any non-trivial algorithm must have loss in which $EMD(\hat p, p)$ and $b$ are combined nonlinearly, as in our non-robust upper bound of $O\left(\sqrt{b} \cdot \max(EMD(\hat p, p), 1)\right)$.  A natural question is whether it is actually necessary to have something like $\max(EMD(\hat p, p), 1)$ in this bound.  We can show that it is, at least as long as we want the multiplier of $EMD(\hat p, p)$ to be $o(b)$ (for the full proof see Appendix~\ref{appendix:proofs of three lower bounds}).  
+
+\begin{restatable}{thm}{lowerboundmax} \label{thm:lower bound when EMD is in 1/b additive loss is at least Omega(1)}
+    Let $\hat{p}$ be a distributional prediction and $p$ be the unknown true distribution.  There is no algorithm $ALG$ (deterministic or randomized) with expected additive loss $c(ALG_p) - c(OPT_p) \leq o(b) \cdot EMD(\hat p, p)$.   
+\end{restatable}
+
+So when $\hat p$ is extremely close to $p$ (subconstant $EMD(\hat p, p)$) we need to allow some extra error, which is precisely what our bound of $\sqrt{b} \cdot \max(EMD(\hat p, p), 1)$ does.  But now that we have justified the use of $\max(EMD(\hat p, p), 1)$, a natural next question is whether the $\sqrt{b}$ term is tight.  Our next lower bound implies that it is, by proving a lower bound that precisely matches our upper bound under the restriction that the bound be of the form $f(b) \cdot \max(EMD(\hat{p},p),1)$.   
+
+\begin{restatable}{thm}{matchinglowerbound}
+    \label{thm:lower bound for the multiplicative sqrt{b}EMD}
+    Let $\hat{p}$ be a distributional prediction and $p$ be the unknown true distribution. There is no algorithm $ALG$ (deterministic or randomized) with $c(ALG_p) - c(OPT_p) \leq o\left(\sqrt{b}\right) \cdot \max(EMD(\hat{p},p),1)$.
+\end{restatable}
+
+
+The previous lower bounds are about the non-robust version of the algorithm.  For our final lower bound, we show that our main algorithm (with the robustness guarantee) is optimal from the perspective of robustness vs.\ consistency.  As mentioned, Theorem~\ref{thm:new theorem} implies that our algorithm has additive loss $O(\sqrt{b})$ when $EMD(\hat{p},p) = 0$ (consistency) and has additive loss $O(b \log b)$ when $EMD(\hat{p},p)$ is arbitrarily large (robustness).  We show that this is pareto-optimal: any algorithm with this consistency (or better) must have this robustness (or worse).  The proof of this theorem can be found in Section~\ref{sec: consistency vs robustness tradeoff}.
+
+
+\begin{restatable}{thm}{NewLowerBound} \label{thm:new lower bound}
+    For any deterministic or randomized algorithm $ALG$, if $c(ALG_p)-c(OPT_p)\le O\!\left(\sqrt b\right)$
+    when $EMD(\hat p,p)=0$, then $c(ALG_p)-c(OPT_p)\ge \Omega(b\log b)$ for large enough prediction error $EMD(\hat p,p)$.
+\end{restatable}
+
+
+
+\subsection{Related work}
+\label{subsec:related work}
+
+As mentioned earlier, since its introduction by the seminal paper of \citet{LykourisANDVassilvitskii}, the algorithms with predictions framework has seen an explosion of work.  This literature is too vast to summarize, so we instead just point the interested reader to the early survey of \citet{MV02} and the excellent online list of papers maintained by \cite{ALPSweb}.  The non-ski rental part of this literature that is most closely connected to this paper is the recent work on binary search with distributional predictions \citep{dinitz2024binarysearchdistributionalpredictions}, which studied a very similar problem in the context of binary search (how to utilize a distributional prediction as opposed to the previous literature that focused on point predictions).
+
+The ski rental problem is one of the most fundamental online problems, modeling the fundamental ``rent-or-buy'' question that is at the heart of many online decision-making tasks.  It and its variants have been studied extensively, including in the context of algorithms with predictions~\citep{antoniadis2021learningaugmenteddynamicpowermanagement,besbes,BHATTACHARYA202239,diakonikolas2021learning,kumar2024improvingonlinealgorithmsml,shen2025algorithmscalibratedmachinelearning,shin2023optimalconsistencyrobustnesstradeofflearningaugmented,pmlr-v202-shin23c,wang2020onlinealgorithmsmultishopski}.  The papers most related to our work are \citet{kumar2024improvingonlinealgorithmsml}, \citet{diakonikolas2021learning}, and \citet{besbes}.  The state-of-the-art algorithm for the classical ski rental problem with point predictions is due to \citet{kumar2024improvingonlinealgorithmsml}, whose work is also a key reference here.  They provide a non-robust algorithm for point predictions, as well as a robust version, and our results are heavily inspired by theirs.
+
+\citet{diakonikolas2021learning} and \citet{besbes} also extend to distributional predictions, as we do, but their papers have different focuses and results.  \citet{diakonikolas2021learning} focus on the \emph{sample-complexity} problem. Rather than assuming that we are given a distribution, they assume that we have \emph{sample access} to a distribution and study how many samples are needed before we can design algorithms with performance comparable to the optimal policy for that distribution.  By assuming the distribution belongs to a structured family (e.g., log-concave), they can get strong sample-complexity bounds.  But they are not concerned with what happens when we sample from a \emph{different} distribution, and do not provide any bounds that are a function of the distance between the prediction (the distribution they sample from) and the true distribution.
+
+\citet{besbes} also considers a distributional prediction and considers both the low-sample case of~\citet{diakonikolas2021learning} and the full distributional information case that we consider.  However, in line with classical work on robust optimization, they assume that they know $EMD(\hat p, p)$. Their setting can be phrased as optimization under an uncertainty set: given a prediction $\hat p$ and a value $\eta$ with the promise that $EMD(\hat p, p) \leq \eta$, they want to design a policy that is competitive with the optimal policy for $p$.  This assumption that they know $EMD(\hat p, p)$ allows for very strong results.  For example, if $EMD(\hat p, p) = 0$ then they can simply run the optimal policy for $p$, since they know that their prediction is accurate.  And since they know $EMD(\hat p, p)$ they are not concerned with designing robust algorithms (as we do in Theorem~\ref{thm:new theorem} and Theorem~\ref{thm: new robustification}): if $EMD(\hat p, p)$ is large then they can run the classical worst-case algorithm from the beginning, and so robustness is trivial. 

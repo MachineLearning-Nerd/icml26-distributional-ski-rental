@@ -1,0 +1,191 @@
+\section{Main algorithm}
+\label{sec: new algorithm}
+
+
+In this section we focus on Theorem~\ref{thm:new theorem}, which is our main upper bound: we give an algorithm that not only achieves an additive loss of $O(\sqrt{b} \cdot \max(EMD(\hat{p},p),1))$, but guarantees an additive loss bounded by $O(b \log b)$. 
+Section~\ref{sec:results} provides the high-level ideas for the analysis. Here, we present the main algorithm (Algorithm~\ref{alg:new algorithm}), together with the formal theorem statement and proofs.
+We assume without loss of generality that $\sqrt b$ is an integer; otherwise, we use $\lfloor\sqrt b\rfloor$ instead.
+
+
+Recall the statement of Theorem~\ref{thm:new theorem}:
+
+\newtheorem*
+
+The algorithm that we will use to prove Theorem~\ref{thm:new theorem} is Algorithm~\ref{alg:new algorithm}, which we gave informally in Section~\ref{sec:results} so now present formally.  Note that $\hat K$ could be $\infty$ in this algorithm (if the optimal policy to $\hat p$ is to never buy), but $U$ is always finite.
+
+\begin{algorithm}
+\caption{Main algorithm}
+\label{alg:new algorithm}
+\begin{algorithmic}[1]
+\STATE \textbf{Compute} the optimal policy $A_{\hat{K}}$ for the prediction $\hat{p}$.
+\STATE \textbf{Compute} the threshold $U$ such that the remaining tail mass of $\hat{p}$ is at most $1/\sqrt{b}$, i.e.,
+\[
+U \;=\; \min\left\{ t : \sum_{\tau>t} \hat{p}_{\tau} \le \frac{1}{\sqrt{b}} \right\}.
+\]
+\STATE \textbf{Set} $K^* = \min\!\big(\hat{K} + \sqrt{b},\, U + \sqrt{b}\big)$.
+\STATE \textbf{Run} $A_{K^*}$.
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+The rest of this section is devoted to proving that Algorithm~\ref{alg:new algorithm} has the bound claimed by Theorem~\ref{thm:new theorem}.  This proof proceeds in two parts. 
+We first bound the additive loss of Algorithm~\ref{alg:new algorithm} by 
+$O\!\left(\sqrt{b}\cdot \max\!\left(EMD(\hat p,p),1\right)\right)$ (Theorem~\ref{thm: root b*EMD bound for new algorithm})
+and then establish a second bound of $O(b\log b)$ (Theorem~\ref{thm: b logb bound for new algorithm}). 
+The theorem follows by taking the minimum of the two bounds.
+
+We first prove a useful lemma relating tails of distributions.
+
+\begin{lemma}
+\label{lem:EMD-tail}
+Let $p$ and $\hat p$ be distributions over $\mathbb{Z}_{\ge 0}$. Then for any $a\ge 0$ and any $s>0$,
+\[\sum_{t>a+s} p_t \;\le\; \sum_{t>a} \hat p_t \;+\; \frac{EMD(\hat p,p)}{s}.\]
+\end{lemma}
+
+\begin{proof}
+Let $\pi(x,y)$ be an optimal transport plan achieving $EMD(\hat p,p)$: formally, let $\pi: [N] \times [N] \rightarrow \mathbb{R}_{\geq 0}$ such that $\sum_y \pi(x,y)=\hat p_x$, $\sum_x \pi(x,y)=p_y$,
+and $EMD(\hat p,p)=\sum_{x,y} \pi(x,y)\,|x-y|$.
+Such a $\pi$ must exist by the definition of $EMD(\hat p, p)$.  
+
+We decompose the tail mass of $p$ beyond $a+s$ according to the origin index $x$ under $\pi$:
+\[\sum_{t>a+s} p_t = \sum_{\substack{y>a+s \\ x>a}} \pi(x,y) + \sum_{\substack{y>a+s \\ x\le a}} \pi(x,y).\]
+
+The first term is at most $\sum_{t>a} \hat p_t$, since it only uses mass originating from indices $x>a$.
+
+For the second term, observe that whenever $y>a+s$ and $x\le a$, we have $|x-y|>s$.
+Therefore,
+\[\sum_{\substack{y>a+s \\ x\le a}} \pi(x,y) \;\le\; \frac{1}{s} \sum_{\substack{y>a+s \\ x\le a}} \pi(x,y)\,|x-y| \;\le\; \frac{1}{s} \sum_{x,y} \pi(x,y)\,|x-y| \;\le\; \frac{EMD(\hat p,p)}{s}. \]
+
+Combining the two bounds yields
+\[\sum_{t>a+s} p_t \;\le\; \sum_{t>a} \hat p_t + \frac{EMD(\hat p,p)}{s}. \qedhere\]
+\end{proof}
+
+A crucial first step in proving the non-robust bound will be to bound the loss of the ``base algorithm'', i.e., the variant of Algorithm~\ref{alg:new algorithm} that skips step $2$ and just sets $K^* = \hat K + \sqrt{b}$.  
+
+\begin{restatable}{thm}{maintheorem} \label{thm:main}
+    The base algorithm has expected additive loss
+    \[c(ALG_p) - c(OPT_p) \leq O\left(\sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right)\right)\]
+\end{restatable}
+
+As mentioned, this follows directly from equation (E-28) in the online appendix of \citet{besbes} by setting $\delta=-\sqrt{b}$ in that equation.  However, we include an independently discovered proof of this theorem in Appendix~\ref{appendix:analysis of the main algorithm}, as we believe that it is more intuitive and direct.  
+
+With this fact in hand, we can now prove our non-robust bound, i.e., that Algorithm~\ref{alg:new algorithm} has loss at most $O\!\left(\sqrt{b}\cdot \max\!\left(EMD(\hat p,p),1\right)\right)$. 
+
+\begin{thm}
+    \label{thm: root b*EMD bound for new algorithm}
+    Let ALG be the corresponding output policy of Algorithm~\ref{alg:new algorithm}. Then we have
+    \[c(ALG_p) - c(OPT_p) \leq O\left(\sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right)\right).\]
+\end{thm}
+
+\begin{proof}
+    Since $A_{\hat{K}}$ is the optimal policy for $\hat{p}$, we know from Theorem~\ref{thm:main} that 
+    \[c((A_{\hat{K}+\sqrt b})_p) - c(OPT_p) \leq O\left(\sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right)\right).\]
+    Therefore, to prove Theorem~\ref{thm: root b*EMD bound for new algorithm}, we only need to show that 
+    \[c(ALG_p) - c((A_{\hat{K}+\sqrt b})_p)  \leq O\left(\sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right)\right).\]
+    We call $c(ALG_p) - c((A_{\hat{K}+\sqrt b})_p)$ the expected \emph{truncation loss}. Note that $ALG$ and $A_{\hat{K}+\sqrt b}$ differ only if $ALG$ truncates earlier than $A_{\hat{K}+\sqrt b}$. This happens when $U+\sqrt{b} < \hat K + \sqrt{b}$ and $ALG$ buys on day $U+\sqrt b+1$ instead of $\hat K+\sqrt b+1$.
+    In this case, the additional cost incurred by $ALG$ is at most $b$, and this occurs only when the realized rental length satisfies $t>U+\sqrt b$.
+    Therefore, the expected truncation loss is bounded by
+    \[c(ALG_p)-c\big((A_{\hat K+\sqrt b})_p\big) \leq b\cdot \sum_{t>U+\sqrt b} p_t .\]
+    Applying Lemma~\ref{lem:EMD-tail} with $a=U$ and $s=\sqrt b$, we obtain
+    \[\sum_{t>U+\sqrt b} p_t \;\le\; \sum_{t>U} \hat p_t + \frac{EMD(\hat p,p)}{\sqrt b}.\]
+    By the definition of $U$, $\sum_{t>U} \hat p_t \le 1/\sqrt b$.
+    Therefore,
+    \[\sum_{t>U+\sqrt b} p_t \;\le\; \frac{1}{\sqrt b} + \frac{EMD(\hat p,p)}{\sqrt b}.\]
+    Putting these together, we get that
+    \[c(ALG_p)-c\big((A_{\hat K+\sqrt b})_p\big) \leq b \cdot \left( \frac{1}{\sqrt b} + \frac{EMD(\hat p,p)}{\sqrt b} \right) \leq O\left(\sqrt{b} \cdot \max\left(EMD(\hat p, p), 1\right)\right).\]
+\end{proof}
+
+Now we want to prove the robustness bound in Theorem~\ref{thm:new theorem}, i.e., that the additive loss of Algorithm~\ref{alg:new algorithm} is at most $O(b \log b)$.  First let us denote $\hat{Q}_K \coloneqq \sum_{t>K} \hat{p}_t, \ \ K=0,1,2,\dots$. Then a simple calculation implies that  
+\[
+c((A_K)_{\hat{p}})
+= \sum_{t \leq K} t\hat{p}_t + \sum_{t>K} (K + b)\hat{p}_t
+= \sum_{i=0}^{K-1} \hat{Q}_i + b \, \hat{Q}_K
+\tag{$\triangle$}
+\label{eq:triangle}
+\]
+For $L<\hat{K}$, we have $c((A_{\hat{K}})_{\hat{p}}) \leq c((A_{L})_{\hat{p}})$ since $A_{\hat{K}}$ is the optimal policy for $\hat{p}$. Writing this in terms of $\hat{Q}_i$ as above, \footnote{When $A_\infty$ is the optimal policy for $\hat{p}$, we have that for any finite $L$, $\sum_{i \geq L}\hat{Q}_i \leq b \hat{Q}_L$ for all $L$.} we get that 
+\begin{align}
+&\sum_{i=0}^{\hat K -1} \hat Q_i + b \hat Q_{\hat K} \leq \sum_{i=0}^{L-1} \hat Q_i + b \hat Q_L \notag \\
+\implies &\sum_{i=L}^{\hat{K}-1} \hat{Q}_i \leq b \bigl(\hat{Q}_L - \hat{Q}_{\hat{K}}\bigr).
+\tag{$\S$}\label{eq:S}
+\end{align}
+
+We now prove two useful lemmas.
+
+\begin{lemma}
+    \label{lm:tail mass after hat(K)-j}
+    Let $r = \frac{b-1}{b}$. For every $j=0,1,\cdots,\hat{K}$, we have $\hat{Q}_{\hat{K}-j} \geq \frac{\hat{Q}_{\hat{K}}}{r^j}$.
+\end{lemma}
+
+\begin{proof}
+    For simplicity, we write $q \coloneqq \hat{Q}_{\hat{K}}$. We prove the lemma by induction on $j$.
+    
+    When $j=0$, we have $\hat{Q}_{\hat{K}} = q \geq q$, as required.
+
+    For the inductive step, assume that $\hat{Q}_{\hat{K}-j} \geq \frac{\hat{Q}_{\hat{K}}}{r^j}$ holds for $1,2,\cdots, j-1$. Apply $\eqref{eq:S}$ with $L = \hat{K} - j$. We have $\sum_{i=\hat{K}-j}^{\hat{K}-1} \hat{Q}_i \leq b \bigl(\hat{Q}_{\hat{K}-j} - q\bigr)$. Separating the term $\hat{Q}_{\hat{K}-j}$ from the left-hand side and rearranging terms give that
+    \[(b-1)\hat{Q}_{\hat{K}-j} \geq  bq+ \sum_{m=1}^{j-1} \hat{Q}_{\hat{K}-m} \geq bq + \sum_{m=1}^{j-1} \frac{q}{r^m}\]
+    where the last inequality above holds due to the induction hypothesis. Now a standard calculation for a geometric series and the fact that $r = \frac{b-1}{b}$ imply that 
+    \[\hat{Q}_{\hat{K}-j} \geq \frac{b}{b-1} q + \frac{1}{b-1} \sum_{m=1}^{j-1} \frac{q}{r^m} = \frac{q}{r^j}. \qedhere\]
+\end{proof}
+
+\begin{lemma}
+    \label{lm:distance jump from tail alpha to tail beta}
+    Let $0<\beta<\alpha\le 1$. For any $\gamma\in[0,1]$, define
+    $t(\gamma)\;:=\;\min\{\,t\in\mathbb{Z}_{\ge 0} : \hat Q_t \le \gamma\,\}$.
+    Assume that $t(\alpha)<\hat K$ and $t(\beta)\le \hat K$. Then
+    $t(\beta)\;\le\; t(\alpha)\;+\;\frac{b\,\alpha}{\beta}$.
+\end{lemma}
+
+\begin{proof}
+    Since $t(\alpha)<\hat K$, taking $L=t(\alpha)$ in inequality~\eqref{eq:S} gives
+    \[\sum_{i=t(\alpha)}^{\hat K-1} \hat Q_i \le b\,\hat Q_{t(\alpha)} \le b\,\alpha.\]
+    Since $t(\beta)\le \hat K$, the indices $i=t(\alpha),\dots,t(\beta)-1$ are all at most $\hat K-1$.
+    By the definition of $t(\beta)$, we have $\hat Q_i>\beta$ for each such $i$.
+    Therefore,
+    \[\sum_{i=t(\alpha)}^{\hat K-1} \hat Q_i \ge \sum_{i=t(\alpha)}^{t(\beta)-1} \hat Q_i > \bigl(t(\beta)-t(\alpha)\bigr)\beta. \]
+    Combining the two inequalities above yields $\bigl(t(\beta)-t(\alpha)\bigr)\beta < b\,\alpha$,\footnote{When the optimal policy for $\hat{p}$ is $A_\infty$, we are able to follow the same route and get $t(\frac{\alpha}{2})<t(\alpha)+2b$, for every $\alpha \in (0,1]$.} which implies the lemma.
+\end{proof}
+
+Now we can prove the second part of Theorem~\ref{thm:new theorem}.
+
+\begin{thm}
+    \label{thm: b logb bound for new algorithm}
+    Let ALG be the corresponding output policy of Algorithm~\ref{alg:new algorithm}. Then we have
+    \[c(ALG_p) - c(OPT_p) \leq O(b \log b).\]
+\end{thm}
+
+\begin{proof}
+    If $\hat K < U$, then by the definition of $U$ we have $\hat Q_{\hat K} > 1/\sqrt b$. Taking $j=\hat K$ in Lemma~\ref{lm:tail mass after hat(K)-j}, we obtain $1=\hat Q_0 \ge \frac{\hat Q_{\hat K}}{r^{\hat K}}$. Equivalently, $\hat Q_{\hat K} \le r^{\hat K} = \left(\frac{b-1}{b}\right)^{\hat K} \le e^{-\hat K/b}$.
+    Combining this with $\hat Q_{\hat K} > 1/\sqrt b$ yields $\frac{1}{\sqrt b} < e^{-\hat K/b}$, which implies that $\hat K < \tfrac{1}{2} b \log b$. Hence, $K^* \le O(b\log b)$.
+
+    If $U\le \hat K$, we show that $U\le O(b\log b)$.
+    The idea is to apply Lemma~\ref{lm:distance jump from tail alpha to tail beta} at dyadic tail levels down to $\frac{1}{\sqrt{b}}$.
+    Let $j^*:=\lceil \tfrac{1}{2}\log_2 b\rceil$.
+    Then $2^{-(j^*-1)}>\frac{1}{\sqrt{b}} \ge 2^{-j^*}$.
+    Define $\alpha:=2^{-(j^*-1)}$, so that $\alpha\in(\frac{1}{\sqrt{b}},\,\frac{2}{\sqrt{b}}]$.
+    
+    We first bound $t(\alpha)$.
+    Starting from level $1$ and repeatedly halving, we consider the sequence $1,1/2,1/4,\dots,\alpha$.
+    For each intermediate level $\alpha_j:=2^{-j}$ with $j\le j^*-1$, we have $\alpha_j>\frac{1}{\sqrt{b}}$, which implies $t(\alpha_j)\le U\le \hat K$.
+    Therefore, we may iteratively apply Lemma~\ref{lm:distance jump from tail alpha to tail beta} with $\beta=\alpha_j/2$, yielding
+    $t(\alpha)=t(2^{-(j^*-1)})\le 2b(j^*-1)$.
+    
+    We now consider the final step from level $\alpha$ down to $\frac{1}{\sqrt{b}}$.
+    Applying Lemma~\ref{lm:distance jump from tail alpha to tail beta} with $\alpha=2^{-(j^*-1)}$ and $\beta=\frac{1}{\sqrt{b}}$, and using the fact that $t(\beta)=U\le \hat K$, we obtain
+    $$U=t(1/\sqrt{b})\le t(\alpha)+ \frac{b\alpha}{1/\sqrt{b}}=t(\alpha)+b\alpha\sqrt b.$$
+    Since $\alpha\le \frac{2}{\sqrt{b}}$, we have $b\alpha\sqrt b\le 2b$, and hence
+    $U\le t(\alpha)+2b$.
+    Combining with the bound on $t(\alpha)$ gives
+    $U\le 2b(j^*-1)+2b=2bj^* = 2b\lceil \tfrac{1}{2}\log_2 b\rceil = O(b\log b)$.
+    Thus, when $U\le \hat K$, we have $U\le O(b\log b)$.\footnote{When $A_\infty$ is the optimal policy for $\hat{p}$, we do not need to separate the final step because the lemma holds for all $\alpha$. In this case, just iterating the lemma starting from $\alpha=1$ and after $m$ halvings we have $t(2^{-m}) \leq 2bm$. The result holds by choosing $m$ with $2^{-m} \leq 
+    \frac{1}{\sqrt{b}}$.}
+    
+    This implies that Algorithm~\ref{alg:new algorithm} always truncates by time $O(b\log b)$, and therefore incurs cost (and additive loss) at most $O(b\log b)$.
+\end{proof}
+
+
+\begin{proof}[Proof of Theorem~\ref{thm:new theorem}]
+This is directly implied by taking the minimum of the two bounds in Theorems~\ref{thm: root b*EMD bound for new algorithm} and \ref{thm: b logb bound for new algorithm}.
+\end{proof}

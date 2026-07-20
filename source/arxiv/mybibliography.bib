@@ -1,0 +1,435 @@
+@article{LykourisANDVassilvitskii,
+author = {Lykouris, Thodoris and Vassilvitskii, Sergei},
+title = {Competitive Caching with Machine Learned Advice},
+year = {2021},
+issue_date = {August 2021},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {68},
+number = {4},
+issn = {0004-5411},
+url = {https://doi.org/10.1145/3447579},
+doi = {10.1145/3447579},
+abstract = {Traditional online algorithms encapsulate decision making under uncertainty, and give ways to hedge against all possible future events, while guaranteeing a nearly optimal solution, as compared to an offline optimum. On the other hand, machine learning algorithms are in the business of extrapolating patterns found in the data to predict the future, and usually come with strong guarantees on the expected generalization error.In this work, we develop a framework for augmenting online algorithms with a machine learned predictor to achieve competitive ratios that provably improve upon unconditional worst-case lower bounds when the predictor has low error. Our approach treats the predictor as a complete black box and is not dependent on its inner workings or the exact distribution of its errors.We apply this framework to the traditional caching problem—creating an eviction strategy for a cache of size k. We demonstrate that naively following the oracle’s recommendations may lead to very poor performance, even when the average error is quite low. Instead, we show how to modify the Marker algorithm to take into account the predictions and prove that this combined approach achieves a competitive ratio that both (i) decreases as the predictor’s error decreases and (ii) is always capped by O(log k), which can be achieved without any assistance from the predictor. We complement our results with an empirical evaluation of our algorithm on real-world datasets and show that it performs well empirically even when using simple off-the-shelf predictions.},
+journal = {J. ACM},
+month = jul,
+articleno = {24},
+numpages = {25},
+keywords = {beyond worst-case analysis, paging, machine learned predictions, Online algorithms}
+}
+
+
+
+@inproceedings{dinitz2024binarysearchdistributionalpredictions,
+ author = {Dinitz, Michael and Im, Sungjin and Lavastida, Thomas and Moseley, Benjamin and Niaparast, Aidin and Vassilvitskii, Sergei},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Globerson and L. Mackey and D. Belgrave and A. Fan and U. Paquet and J. Tomczak and C. Zhang},
+ pages = {90456--90472},
+ publisher = {Curran Associates, Inc.},
+ title = {Binary Search with Distributional Predictions},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/a4b293979b8b521e9222d30c40246911-Paper-Conference.pdf},
+ volume = {37},
+ year = {2024}
+}
+
+
+
+@inproceedings{kumar2024improvingonlinealgorithmsml,
+ author = {Purohit, Manish and Svitkina, Zoya and Kumar, Ravi},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {S. Bengio and H. Wallach and H. Larochelle and K. Grauman and N. Cesa-Bianchi and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Improving Online Algorithms via ML Predictions},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2018/file/73a427badebe0e32caa2e1fc7530b7f3-Paper.pdf},
+ volume = {31},
+ year = {2018}
+}
+
+
+@techreport{centroidlowerbound,
+  author = {Cohen, Scott and Guibas, Leonidas},
+  title = {The Earth Mover''s Distance: Lower Bounds and Invariance under Translation},
+  year = {1997},
+  institution = {Stanford University Vision Laboratory},
+  publisher = {Stanford University},
+  address = {Stanford, CA, USA},
+  abstract = {The Earth Mover''s Distance (EMD) between two finite distributions of weight is proportional to the minimum amount of work required to transform one distribution into the other. Current content-based retrieval work in the Stanford Vision Laboratory uses the EMD as a common framework for measuring image similarity with respect to color, texture, and shape content. In this report, we present some fast to compute lower bounds on the EMD which may allow a system to avoid exact, more expensive EMD computations during query processing. The effectiveness of the lower bounds is tested in a color-based retrieval system. In addition to the lower bound work, we also show how to compute the EMD under translation. In this problem, the points in one distribution are free to translate, and the goal is to find a translation that minimizes the EMD to the other distribution.}
+}
+
+
+@inproceedings{elias2024learningaugmentedalgorithmsexplicitpredictors,
+ author = {Eli\'{a}\v{s}, Marek and Kaplan, Haim and Mansour, Yishay and Moran, Shay},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Globerson and L. Mackey and D. Belgrave and A. Fan and U. Paquet and J. Tomczak and C. Zhang},
+ pages = {97972--98008},
+ publisher = {Curran Associates, Inc.},
+ title = {Learning-Augmented Algorithms with Explicit Predictors},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/b1a72c79ac7512df8d7b573f38143ac4-Paper-Conference.pdf},
+ volume = {37},
+ year = {2024}
+}
+
+
+@inbook{doi:10.1137/1.9781611975994.114,
+author = {Silvio Lattanzi and Thomas Lavastida and Benjamin Moseley and Sergei Vassilvitskii},
+title = {Online Scheduling via Learned Weights},
+booktitle = {Proceedings of the 2020 ACM-SIAM Symposium on Discrete Algorithms (SODA)},
+chapter = {},
+pages = {1859-1877},
+doi = {10.1137/1.9781611975994.114},
+URL = {https://epubs.siam.org/doi/abs/10.1137/1.9781611975994.114},
+eprint = {https://epubs.siam.org/doi/pdf/10.1137/1.9781611975994.114},
+    abstract = { Online algorithms are a hallmark of worst case optimization under uncertainty. On the other hand, in practice, the input is often far from worst case, and has some predictable characteristics. A recent line of work has shown how to use machine learned predictions to circumvent strong lower bounds on competitive ratios in classic online problems such as ski rental and caching. We study how predictive techniques can be used to break through worst case barriers in online scheduling. The makespan minimization problem with restricted assignments is a classic problem in online scheduling theory. Worst case analysis of this problem gives Ω(log m) lower bounds on the competitive ratio in the online setting. We identify a robust quantity that can be predicted and then used to guide online algorithms to achieve better performance. Our predictions are compact in size, having dimension linear in the number of machines, and can be learned using standard off the shelf methods. The performance guarantees of our algorithms depend on the accuracy of the predictions, given predictions with error η, we show how to construct O(log η) competitive fractional assignments. We then give an online algorithm that rounds any fractional assignment into an integral schedule. Our algorithm is O((log log m)3)-competitive and we give a nearly matching Ω(log log m) lower bound for online rounding algorithms.1 Altogether, we give algorithms that, equipped with predictions with error η, achieve O(log η (log log m)3) competitive ratios, breaking the Ω(log m) lower bound even for moderately accurate predictions. }
+}
+
+
+@inproceedings{bamas2020learningaugmentedenergyminimization,
+  author    = {Bamas, {\'E}tienne and Maggiori, Andreas and Rohwedder, Lars and Svensson, Ola},
+  title     = {Learning augmented energy minimization via speed scaling},
+  booktitle = {Advances in Neural Information Processing Systems},
+  editor    = {H. Larochelle and M. Ranzato and R. Hadsell and M. F. Balcan and H. Lin},
+  volume    = {33},                       
+  pages     = {15350--15359},             
+  year      = {2020},
+  publisher = {Curran Associates Inc.},    
+  url       = {https://proceedings.neurips.cc/paper/2020/file/7b7a53e239400a13bd6be6c91c4f6c4e-Paper.pdf} 
+}
+
+
+
+@inproceedings{antoniadis2020secretaryonlinematchingproblems,
+ author = {Antoniadis, Antonios and Gouleakis, Themis and Kleer, Pieter and Kolev, Pavel},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+ pages = {7933--7944},
+ publisher = {Curran Associates, Inc.},
+ title = {Secretary and Online Matching Problems with Machine Learned Advice},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2020/file/5a378f8490c8d6af8647a753812f6e31-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
+
+@inproceedings{dinitz2021fastermatchingslearnedduals,
+ author = {Dinitz, Michael and Im, Sungjin and Lavastida, Thomas and Moseley, Benjamin and Vassilvitskii, Sergei},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
+ pages = {10393--10406},
+ publisher = {Curran Associates, Inc.},
+ title = {Faster Matchings via Learned Duals},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2021/file/5616060fb8ae85d93f334e7267307664-Paper.pdf},
+ volume = {34},
+ year = {2021}
+}
+
+
+@InProceedings{lin2022learningaugmentedbinarysearch,
+  title = 	 {Learning Augmented Binary Search Trees},
+  author =       {Lin, Honghao and Luo, Tian and Woodruff, David},
+  booktitle = 	 {Proceedings of the 39th International Conference on Machine Learning},
+  pages = 	 {13431--13440},
+  year = 	 {2022},
+  editor = 	 {Chaudhuri, Kamalika and Jegelka, Stefanie and Song, Le and Szepesvari, Csaba and Niu, Gang and Sabato, Sivan},
+  volume = 	 {162},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {17--23 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v162/lin22f/lin22f.pdf},
+  url = 	 {https://proceedings.mlr.press/v162/lin22f.html},
+  abstract = 	 {A treap is a classic randomized binary search tree data structure that is easy to implement and supports O(log n) expected time access. However, classic treaps do not take advantage of the input distribution or patterns in the input. Given recent advances in algorithms with predictions, we propose pairing treaps with machine advice to form a learning-augmented treap. We are the first to propose a learning-augmented data structure that supports binary search tree operations such as range-query and successor functionalities. With the assumption that we have access to advice from a frequency estimation oracle, we assign learned priorities to the nodes to better improve the treap’s structure. We theoretically analyze the learning-augmented treap’s performance under various input distributions and show that under those circumstances, our learning-augmented treap has stronger guarantees than classic treaps and other classic tree-based data structures. Further, we experimentally evaluate our learned treap on synthetic datasets and demonstrate a performance advantage over other search tree data structures. We also present experiments on real world datasets with known frequency estimation oracles and show improvements as well.}
+}
+
+
+@inproceedings{dinitz2022algorithmspredictionportfolios,
+ author = {Dinitz, Michael and Im, Sungjin and Lavastida, Thomas and Moseley, Benjamin and Vassilvitskii, Sergei},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {S. Koyejo and S. Mohamed and A. Agarwal and D. Belgrave and K. Cho and A. Oh},
+ pages = {20273--20286},
+ publisher = {Curran Associates, Inc.},
+ title = {Algorithms with Prediction Portfolios},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2022/file/7f9220f90cc85b0da693643add6618e6-Paper-Conference.pdf},
+ volume = {35},
+ year = {2022}
+}
+
+
+@InProceedings{anand2022onlinealgorithmsmultiplepredictions,
+  title = 	 {Online Algorithms with Multiple Predictions},
+  author =       {Anand, Keerti and Ge, Rong and Kumar, Amit and Panigrahi, Debmalya},
+  booktitle = 	 {Proceedings of the 39th International Conference on Machine Learning},
+  pages = 	 {582--598},
+  year = 	 {2022},
+  editor = 	 {Chaudhuri, Kamalika and Jegelka, Stefanie and Song, Le and Szepesvari, Csaba and Niu, Gang and Sabato, Sivan},
+  volume = 	 {162},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {17--23 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v162/anand22a/anand22a.pdf},
+  url = 	 {https://proceedings.mlr.press/v162/anand22a.html},
+  abstract = 	 {This paper studies online algorithms augmented with <em>multiple</em> machine-learned predictions. We give a generic algorithmic framework for online covering problems with multiple predictions that obtains an online solution that is competitive against the performance of the <em>best</em> solution obtained from the predictions. Our algorithm incorporates the use of predictions in the classic potential-based analysis of online algorithms. We apply our algorithmic framework to solve classical problems such as online set cover, (weighted) caching, and online facility location in the multiple predictions setting.}
+}
+
+
+@inproceedings{grigorescu2022learningaugmentedalgorithmsonlinelinear,
+ author = {Grigorescu, Elena and Lin, Young-San and Silwal, Sandeep and Song, Maoyuan and Zhou, Samson},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {S. Koyejo and S. Mohamed and A. Agarwal and D. Belgrave and K. Cho and A. Oh},
+ pages = {38643--38654},
+ publisher = {Curran Associates, Inc.},
+ title = {Learning-Augmented Algorithms for Online Linear and Semidefinite Programming},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2022/file/fc5a1845bee1f5405ef99ba25c2d44e1-Paper-Conference.pdf},
+ volume = {35},
+ year = {2022}
+}
+
+
+@InProceedings{khodak2023learningaugmentedprivatealgorithmsmultiple,
+  title = 	 {Learning-augmented private algorithms for multiple quantile release},
+  author =       {Khodak, Mikhail and Amin, Kareem and Dick, Travis and Vassilvitskii, Sergei},
+  booktitle = 	 {Proceedings of the 40th International Conference on Machine Learning},
+  pages = 	 {16344--16376},
+  year = 	 {2023},
+  editor = 	 {Krause, Andreas and Brunskill, Emma and Cho, Kyunghyun and Engelhardt, Barbara and Sabato, Sivan and Scarlett, Jonathan},
+  volume = 	 {202},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {23--29 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v202/khodak23a/khodak23a.pdf},
+  url = 	 {https://proceedings.mlr.press/v202/khodak23a.html},
+  abstract = 	 {When applying differential privacy to sensitive data, we can often improve performance using external information such as other sensitive data, public data, or human priors. We propose to use the learning-augmented algorithms (or algorithms with predictions) framework—previously applied largely to improve time complexity or competitive ratios—as a powerful way of designing and analyzing privacy-preserving methods that can take advantage of such external information to improve utility. This idea is instantiated on the important task of multiple quantile release, for which we derive error guarantees that scale with a natural measure of prediction quality while (almost) recovering state-of-the-art prediction-independent guarantees. Our analysis enjoys several advantages, including minimal assumptions about the data, a natural way of adding robustness, and the provision of useful surrogate losses for two novel ”meta” algorithms that learn predictions from other (potentially sensitive) data. We conclude with experiments on challenging tasks demonstrating that learning predictions across one or more instances can lead to large error reductions while preserving privacy.}
+}
+
+@inproceedings{brand2023dynamicgraphalgorithmspredictions,
+  author    = {Jan van den Brand and Sebastian Forster and Yasamin Nazari and Adam Polak},
+  title     = {On Dynamic Graph Algorithms with Predictions},
+  booktitle = {Proceedings of the 2024 Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)},
+  pages     = {3534--3557},
+  year      = {2024},
+  publisher = {SIAM},
+  doi       = {10.1137/1.9781611977912.126},
+  url       = {https://doi.org/10.1137/1.9781611977912.126}
+}
+
+
+@article{ai2014multishopskirentalproblem,
+author = {Ai, Lingqing and Wu, Xian and Huang, Lingxiao and Huang, Longbo and Tang, Pingzhong and Li, Jian},
+title = {The multi-shop ski rental problem},
+year = {2014},
+issue_date = {June 2014},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {42},
+number = {1},
+issn = {0163-5999},
+url = {https://doi.org/10.1145/2637364.2591984},
+doi = {10.1145/2637364.2591984},
+abstract = {We consider the multi-shop ski rental problem. This problem generalizes the classic ski rental problem to a multi-shop setting, in which each shop has different prices for renting and purchasing a pair of skis, and a consumer has to make decisions on when and where to buy. We are interested in the optimal online (competitive-ratio minimizing) mixed strategy from the consumer's perspective. For our problem in its basic form, we obtain exciting closed-form solutions and a linear time algorithm for computing them. We further demonstrate the generality of our approach by investigating three extensions of our basic problem, namely ones that consider costs incurred by entering a shop or switching to another shop. Our solutions to these problems suggest that the consumer must assign positive probability in exactly one shop at any buying time. Our results apply to many real-world applications, ranging from cost management in IaaS cloud to scheduling in distributed computing.},
+journal = {SIGMETRICS Perform. Eval. Rev.},
+month = jun,
+pages = {463–475},
+numpages = {13},
+keywords = {multi-shop ski rental, nash equilibrium, online algorithm, optimal strategy, ski rental}
+}
+
+
+@inproceedings{wang2020onlinealgorithmsmultishopski,
+ author = {Wang, Shufan and Li, Jian and Wang, Shiqiang},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+ pages = {8150--8160},
+ publisher = {Curran Associates, Inc.},
+ title = {Online Algorithms for Multi-shop Ski Rental with Machine Learned Advice},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2020/file/5cc4bb753030a3d804351b2dfec0d8b5-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
+
+@inproceedings{dinitz2023controllingtailriskonline,
+  author    = {Michael Dinitz and Sungjin Im and Thomas Lavastida and Benjamin Moseley and Sergei Vassilvitskii},
+  title     = {Controlling Tail Risk in Online Ski-Rental},
+  booktitle = {Proceedings of the 2024 Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)},
+  pages     = {4247--4263},
+  year      = {2024},
+  publisher = {SIAM},
+  doi       = {10.1137/1.9781611977912.147},
+  url       = {https://doi.org/10.1137/1.9781611977912.147} 
+}
+
+
+@inproceedings{BHATTACHARYA202239,
+author = {Bhattacharya, Arghya and Das, Rathish},
+title = {Machine Learning Advised Ski Rental Problem with a Discount},
+year = {2022},
+isbn = {978-3-030-96730-7},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+url = {https://doi.org/10.1007/978-3-030-96731-4_18},
+doi = {10.1007/978-3-030-96731-4_18},
+abstract = {Traditional online algorithms are designed to make decisions online in the face of uncertainty to perform well in comparison with the optimal offline algorithm for the worst-case inputs. On the other hand, machine learning algorithms try to extrapolate the pattern from the past inputs to predict the future and take decisions online on basis of the predictions to perform well for the average-case inputs. There have been recent studies to augment traditional online algorithms with machine learning oracles to get better performance for all the possible inputs. The machine learning augmented online algorithms perform provably better than the traditional online algorithms when the error of the machine learning oracle is low for the worst-case inputs and all other average-case inputs.In this paper, we integrate the advantages of the traditional online algorithms and the machine learning algorithms in the context of a novel variant of the ski rental problem. Firstly, we propose the ski rental problem with a discount: in this problem, the rent of the ski, instead of being fixed over time, varies as a function of time. Secondly, we discuss the design and performance evaluation of the online algorithms with machine learning advice to solve the ski rental problem with a discount. Finally, we extend this study to the situation where multiple independent machine learning advice is available. This algorithm design framework motivates to redesign of several online algorithms by augmenting them with one or more machine learning oracles to improve the performance.},
+booktitle = {WALCOM: Algorithms and Computation: 16th International Conference and Workshops, WALCOM 2022, Jember, Indonesia, March 24–26, 2022, Proceedings},
+pages = {213–224},
+numpages = {12},
+keywords = {ML advice, Online algorithm, Ski rental problem},
+location = {Jember, Indonesia}
+}
+
+
+@inproceedings{antoniadis2021learningaugmenteddynamicpowermanagement,
+ author = {Antoniadis, Antonios and Coester, Christian and Elias, Marek and Polak, Adam and Simon, Bertrand},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
+ pages = {16714--16726},
+ publisher = {Curran Associates, Inc.},
+ title = {Learning-Augmented Dynamic Power Management with Multiple States via New Ski Rental Bounds},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2021/file/8b8388180314a337c9aa3c5aa8e2f37a-Paper.pdf},
+ volume = {34},
+ year = {2021}
+}
+
+
+@inproceedings{angelopoulos2024contractschedulingdistributionalmultiple,
+  title     = {Contract Scheduling with Distributional and Multiple Advice},
+  author    = {Angelopoulos, Spyros and Bienkowski, Marcin and Dürr, Christoph and Simon, Bertrand},
+  booktitle = {Proceedings of the Thirty-Third International Joint Conference on
+               Artificial Intelligence, {IJCAI-24}},
+  publisher = {International Joint Conferences on Artificial Intelligence Organization},
+  editor    = {Kate Larson},
+  pages     = {3652--3660},
+  year      = {2024},
+  month     = {8},
+  note      = {Main Track},
+  doi       = {10.24963/ijcai.2024/404},
+  url       = {https://doi.org/10.24963/ijcai.2024/404},
+}
+
+
+@misc{shen2025algorithmscalibratedmachinelearning,
+      title={Algorithms with Calibrated Machine Learning Predictions}, 
+      author={Judy Hanwen Shen and Ellen Vitercik and Anders Wikum},
+      year={2025},
+      eprint={2502.02861},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML},
+      url={https://arxiv.org/abs/2502.02861}, 
+}
+
+@inproceedings{diakonikolas2021learning,
+  title     = {Learning Online Algorithms with Distributional Advice},
+  author    = {Diakonikolas, Ilias and Kontonis, Vasilis and Tzamos, Christos and Vakilian, Ali and Zarifis, Nikos},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning},
+  pages     = {2687--2696},
+  year      = {2021},
+  volume    = {139},
+  series    = {Proceedings of Machine Learning Research},
+  publisher = {PMLR},
+  url       = {https://proceedings.mlr.press/v139/diakonikolas21a.html}
+}
+
+
+@article{besbes,
+  author       = {Omar Besbes and
+                  Will Ma and
+                  Omar Mouchtaki},
+  title        = {Beyond {IID:} Data-Driven Decision Making in Heterogeneous Environments},
+  journal      = {Manag. Sci.},
+  volume       = {71},
+  number       = {12},
+  pages        = {10538--10555},
+  year         = {2025},
+  url          = {https://doi.org/10.1287/mnsc.2022.03448},
+  doi          = {10.1287/MNSC.2022.03448},
+  timestamp    = {Sat, 17 Jan 2026 12:53:48 +0100},
+  biburl       = {https://dblp.org/rec/journals/mansci/BesbesMM25.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@INPROCEEDINGS{Karlin1986CompetitiveSC,
+  author={Karlin, Anna R. and Manasse, Mark S. and Rudolph, Larry and Sleator, Daniel D.},
+  booktitle={27th Annual Symposium on Foundations of Computer Science (sfcs 1986)}, 
+  title={Competitive snoopy caching}, 
+  year={1986},
+  volume={},
+  number={},
+  pages={244-254},
+  keywords={Costs;Computer science;Broadcasting;Multiprocessing systems;Memory architecture;Cache memory;Time measurement;Writing},
+  doi={10.1109/SFCS.1986.14}}
+
+@inproceedings{Karlin1990CompetitiveRA,
+author = {Karlin, Anna R. and Manasse, Mark S. and McGeoch, Lyle A. and Owicki, Susan},
+title = {Competitive randomized algorithms for non-uniform problems},
+year = {1990},
+isbn = {0898712513},
+publisher = {Society for Industrial and Applied Mathematics},
+address = {USA},
+booktitle = {Proceedings of the First Annual ACM-SIAM Symposium on Discrete Algorithms},
+pages = {301–309},
+numpages = {9},
+location = {San Francisco, California, USA},
+series = {SODA '90}
+}
+
+@article{MV02,
+author = {Mitzenmacher, Michael and Vassilvitskii, Sergei},
+title = {Algorithms with predictions},
+year = {2022},
+issue_date = {July 2022},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {65},
+number = {7},
+issn = {0001-0782},
+url = {https://doi.org/10.1145/3528087},
+doi = {10.1145/3528087},
+abstract = {Seeking a new approach that goes beyond worst-case analysis.},
+journal = {Commun. ACM},
+month = jun,
+pages = {33–35},
+numpages = {3}
+}
+
+@misc{ALPSweb,
+  title        = {Algorithms with Predictions
+},
+  author       = {Lindermayr, Alexander and Megow, Nicole},
+  year         = 2025,
+  note         = {\url{https://algorithms-with-predictions.github.io/}}
+}
+
+@misc{shin2023optimalconsistencyrobustnesstradeofflearningaugmented,
+      title={On Optimal Consistency-Robustness Trade-Off for Learning-Augmented Multi-Option Ski Rental}, 
+      author={Yongho Shin and Changyeol Lee and Hyung-Chan An},
+      year={2023},
+      eprint={2312.02547},
+      archivePrefix={arXiv},
+      primaryClass={cs.DS},
+      url={https://arxiv.org/abs/2312.02547}, 
+}
+
+
+@InProceedings{pmlr-v202-shin23c,
+  title = 	 {Improved Learning-Augmented Algorithms for the Multi-Option Ski Rental Problem via Best-Possible Competitive Analysis},
+  author =       {Shin, Yongho and Lee, Changyeol and Lee, Gukryeol and An, Hyung-Chan},
+  booktitle = 	 {Proceedings of the 40th International Conference on Machine Learning},
+  pages = 	 {31539--31561},
+  year = 	 {2023},
+  editor = 	 {Krause, Andreas and Brunskill, Emma and Cho, Kyunghyun and Engelhardt, Barbara and Sabato, Sivan and Scarlett, Jonathan},
+  volume = 	 {202},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {23--29 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v202/shin23c/shin23c.pdf},
+  url = 	 {https://proceedings.mlr.press/v202/shin23c.html},
+}
+
+
+@misc{kang2025learningaugmentedskirentaldiscrete,
+      title={Learning-Augmented Ski Rental with Discrete Distributions: A Bayesian Approach}, 
+      author={Bosun Kang and Hyejun Park and Chenglin Fan},
+      year={2025},
+      eprint={2512.07313},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2512.07313}, 
+}

@@ -1,0 +1,90 @@
+
+\section{Technical proofs of lower bounds}
+\label{appendix:proofs of three lower bounds}
+
+This section gives the technical proofs of the three lower bounds (Theorems~\ref{thm:lower bound any sublinear in b}~\ref{thm:lower bound when EMD is in 1/b additive loss is at least Omega(1)}~\ref{thm:lower bound for the multiplicative sqrt{b}EMD}) mentioned in Section~\ref{sec:results}.
+
+
+
+
+
+
+\subsection*{Proof of Theorem~\ref{thm:lower bound any sublinear in b}}
+\label{appendix:proof_lowerbound_1}
+\begin{proof}
+Let $r=1-\epsilon$. We assume that $b^{\frac{r+1}{2}}$ is an integer; otherwise, we consider $\lfloor b^{\frac{r+1}{2}} \rfloor$ instead. Consider the following $b^{\frac{r+1}{2}}+2$ different probability distributions $p^{(j)}, 1 \leq j \leq b^{\frac{r+1}{2}}+2$, where \begin{align*}
+    p^{(j)}_t &= 
+    \begin{cases} 
+      \delta & \ \text{if } t = j \\
+      1-\delta & \ \text{if } t = b^{\frac{r+1}{2}} + 1 + b
+    \end{cases} 
+    \end{align*}
+    and $\delta = b^{\frac{r+1}{2}-1}+\frac{2}{b}+\frac{1}{b^2}$. Note that the $EMD$ between any two distributions is bounded by $O(b^{\frac{r+1}{2}} \cdot b^{\frac{r+1}{2}-1}) = O(b^r)$. Consider any prediction $\hat{p}$ such that $EMD(\hat{p},p^{(j)}) \leq O(b^r)$ for every $1 \leq j \leq b^{\frac{r+1}{2}}+2$. We claim that when $\hat{p}$ is our prediction, there is no algorithm $ALG$ such that the additive loss $\text{diff}_p$ is bounded by $O(EMD(\hat{p},p))+O(b^r)$. 
+
+    To show this, let $ALG$ be the algorithm we use. If $ALG=A_K$ for some $0 \leq K \leq b^{\frac{r+1}{2}}$, consider that $p^{(K+1)}$ is the truth. In this case, $c(ALG_p) = K+b$. Due to the choice of~$\delta$, we know that $A_{K+1}$ is the optimal policy for $p^{(K+1)}$. Thus, the optimal policy has cost $c(OPT_p) = (K+1)\delta + (K+1+b)(1-\delta)$. Then, we have $\text{diff}_p = b\delta -1 \geq \Omega(b^{\frac{r+1}{2}})$. Based on the fact that $\frac{r+1}{2}>r$, this proves the claim when~$K \leq b^{\frac{r+1}{2}}$. 
+
+    If $ALG=A_K$ for some $K \geq b^{\frac{r+1}{2}}+1$ or $K=\infty$, consider that $p^{(1)}$ is the truth. Then by the construction of $p^{(1)}$, we see that $c((A_K)_p) \geq c((A_\infty)_p)$ for every $K \geq b^{\frac{r+1}{2}}+1$. In fact, the algorithms $A_K$ can be trivially ruled out for finite $K \geq b^{\frac{r+1}{2}}+1$ since the algorithm has to be bad even with the promise that the truth is from one of the $p^{(j)}$ inputs. Thus, it suffices to prove the claim for $ALG=A_\infty$. In this case, $c((A_\infty)_p)=1\cdot \delta + (b^{\frac{r+1}{2}} + 1 + b)(1-\delta)$ and $c(OPT_p)=1\cdot \delta+(b+1)(1-\delta)$. Then, we have $\text{diff}_p = b^{\frac{r+1}{2}}(1-\delta) \geq \Omega(b^{\frac{r+1}{2}})$. This proves the theorem for all deterministic algorithms.
+
+    To show that this theorem holds even for randomized algorithms, we use Yao's Lemma to make our algorithm $ALG=A_K$ deterministically for some $K$ and choose the truth uniformly at random from $p^{(j)}, 1 \leq j \leq b^{\frac{r+1}{2}}+2$. When $K \leq b^{\frac{r+1}{2}}/2$, there is a constant probability that we choose the truth $p^{(j)}$ where $j$ lies in the next $\Omega(b^{\frac{r+1}{2}})$ interval (e.g. $b^{\frac{r+1}{2}}/4$) passed $K$ because of the uniformly chosen. For any truth $p^{(T)}$ where $T=K+x$ lies in the interval, we have $c((A_K)_{p^{(T)}})=K+b$ and $c(OPT_{p^{(T)}}) = (K+x)\delta+(K+x+b)(1-\delta)$. Thus, $\text{diff}_p =b\delta - x \geq \Omega(b^{\frac{r+1}{2}})$. When $K \geq b^{\frac{r+1}{2}}/2$, there is a constant probability that we choose the truth $p^{(j)}$ where $j$ lies in the $\Omega(b^{\frac{r+1}{2}})$ prefix (e.g. $[1,b^{\frac{r+1}{2}}/4]$). Again, for any truth~$p^{(T)}$ where $T=x$ lies in the above prefix, we have $c((A_K)_{p^{(T)}})=x\delta+(K+b)(1-\delta)$ and $c(OPT_{p^{(T)}}) = x\delta+(x+b)(1-\delta)$. Thus, $\text{diff}_p =(K-x)(1-\delta) \geq \Omega(b^{\frac{r+1}{2}})$. It turns out that we also have this lower bound against randomized algorithms, meaning that even for a randomized algorithm, its expected cost cannot be within the additive loss $O(EMD(\hat{p},p))+O(b^{1-\epsilon})$ of the expected cost to the optimum. 
+\end{proof}
+
+\subsection*{Proof of Theorem~\ref{thm:lower bound when EMD is in 1/b additive loss is at least Omega(1)}}
+\label{appendix:proof_lowerbound_2}
+\begin{proof}
+Define two probability distributions
+    \begin{align*}
+    p^1_t &= 
+    \begin{cases} 
+      \frac{1}{2} & \ \text{if } t = 1 \\
+      \frac{1}{4} & \ \text{if } t = 2 \\
+      \epsilon = \frac{1}{2b} + \delta & \ \text{if } t = 4 \\
+      \frac{1}{4} - \epsilon & \ \text{if } t = b + 3
+    \end{cases} 
+    &  \text{and} \qquad
+    p^2_t &= 
+    \begin{cases} 
+      \frac{1}{2} & \text{if } t = 1 \\
+      \frac{1}{4} + \epsilon & \text{if } t = 2 \\
+      0 & \text{if } t = 4 \\
+      \frac{1}{4} - \epsilon & \text{if } t = b + 3
+    \end{cases}
+    \end{align*}
+where $\delta>0$. One can check that $A_\infty$ is the optimal policy for $p^1$ and $A_2$ is the optimal policy for $p^2$. Notice that $EMD(p^1,p^2) = 2(\frac{1}{2b}+\delta)=\frac{1}{b}+2\delta \leq O(\frac{1}{b})$ for sufficiently small $\delta$. Now, assume that we receive some predicted distribution $\hat{p}$ such that $EMD(\hat{p},p^1) \leq O(\frac{1}{b})$ and $EMD(\hat{p},p^2) \leq O(\frac{1}{b})$. We claim that given the information of this $\hat{p}$, there is no $ALG$ such that we have both
+\[\text{diff}_1 = c(ALG_{p^1}) - c(OPT_{p^1}) \leq o(b) \cdot EMD(\hat{p},p^1)\]
+and
+\[\text{diff}_2 = c(ALG_{p^2}) - c(OPT_{p^2}) \leq o(b) \cdot EMD(\hat{p},p^2).\]
+
+Note that if this claim holds, then it is impossible to find an algorithm such that the additive loss is bounded by $o(b) \cdot EMD(\hat{p},p)$. This is because, based on the information of $\hat{p}$, for any algorithm $ALG$ we choose, at least one of the two formulas above must fail to hold, and the corresponding $p^i$ in the failed formula could possibly be the unknown true distribution $p$ of the problem.
+
+To show this claim, let us use $ALG = A_K$. When $0 \leq K \leq 3$, consider that $p^1$ is the truth. Then, one can check that for each $K=0,1,2,3$, $\text{diff}_1 \geq \Omega(1)$. By the fact that $EMD(\hat{p},p^1) \leq O(\frac{1}{b})$, we have $\text{diff}_1 \geq \Omega(b) \cdot EMD(\hat{p},p^1)$. Thus, the first formula fails. When $K \geq 4$ or $K=\infty$, consider that $p^2$ is the truth. Then, one can check that for each $K \geq 4$ or $K=\infty$, $\text{diff}_2 \geq \Omega(1)$. Hence, we have $\text{diff}_2 \geq \Omega(b) \cdot EMD(\hat{p},p^2)$. This concludes that for any $ALG$ (deterministic or randomized\footnote{Choose the truth $p^i$ such that the total probability mass of deterministic algorithms that perform poorly under $p^i$ is bounded below by a constant, thus holds for any randomized algorithm by Yao's Lemma.}) we choose, there exists some truth $p^i \in \{p^1,p^2\}$ such that using $ALG$ we have $\text{diff}_i \geq \Omega(b) \cdot EMD(\hat{p},p^i)$.
+\end{proof}
+
+\subsection*{Proof of Theorem~\ref{thm:lower bound for the multiplicative sqrt{b}EMD}}
+\label{appendix:proof_lowerbound_3}
+\begin{proof}
+   Consider two distributions $p^1$ and $p^2$ defined as follows.
+
+\begin{align*}
+    p^1_t &= 
+    \begin{cases} 
+      \frac{1}{2} & \ \text{if } t = 1 \\
+      \epsilon = \frac{1}{\sqrt{b}} & \ \text{if } t = \sqrt{b} \\
+      \frac{1}{2} - \epsilon & \ \text{if } t = b -1 + \sqrt{b}
+    \end{cases} 
+    &  \text{and} \qquad
+    p^2_t &= 
+    \begin{cases} 
+      \frac{1}{2} + \epsilon & \ \text{if } t = 1 \\
+      0 & \ \text{if } t = \sqrt{b} \\
+      \frac{1}{2} - \epsilon & \ \text{if } t = b -1 + \sqrt{b}.
+    \end{cases}
+    \end{align*}
+One can check that $A_{\infty}$ is the optimal policy for $p^1$ and $A_1$ is the optimal policy for $p^2$. Notice that $EMD(p^1,p^2) = \epsilon \cdot (\sqrt{b}-1) = \Theta(1)$. Now, assume that we receive some predicted distribution $\hat{p}$ such that $EMD(\hat{p},p^1) = \Theta(1)$ and $EMD(\hat{p},p^2) = \Theta(1)$. We claim that given the information of this $\hat{p}$, there is no $ALG$ such that we have both
+\[\text{diff}_1 = c(ALG_{p^1}) - c(OPT_{p^1}) \leq o(\sqrt{b})\cdot \max(EMD(\hat{p},p),1)\]
+and
+\[\text{diff}_2 = c(ALG_{p^2}) - c(OPT_{p^2}) \leq o(\sqrt{b})\cdot \max(EMD(\hat{p},p),1).\]
+
+Note that if this claim holds, then it is impossible to find an algorithm such that the additive loss is bounded by $o(\sqrt{b})\cdot \max(EMD(\hat{p},p),1)$. This is because, based on the information of $\hat{p}$, for any algorithm $ALG$ we choose, at least one of the two formulas above must fail to hold, and the corresponding $p^i$ in the failed formula could possibly be the unknown true distribution $p$ of the problem.
+
+To show this claim, let us use $ALG = A_K$. When $0 \leq K \leq \sqrt{b}-1$, consider that $p^1$ is the truth. Then, one can check that for each $K \leq \sqrt{b}-1$, $\text{diff}_1 \geq \Omega(\sqrt{b})$. By the fact that $EMD(\hat{p},p^1) = \Theta(1)$, we have $\text{diff}_1 \geq \Omega(\sqrt{b})\cdot \max(EMD(\hat{p},p),1)$. Thus, the first formula fails. When $K \geq \sqrt{b}$ or $K=\infty$, consider that $p^2$ is the truth. Then, one can check that for each $K \geq \sqrt{b}$ or $K=\infty$, $\text{diff}_2 \geq \Omega(\sqrt{b})$. Hence, we have $\text{diff}_2 \geq \Omega(\sqrt{b})\cdot \max(EMD(\hat{p},p),1)$. This concludes that for any $ALG$ (deterministic or randomized\footnote{Choose the truth $p^i$ such that the total probability mass of deterministic algorithms that perform poorly under $p^i$ is bounded below by a constant, thus holds for any randomized algorithm by Yao's Lemma.}) we choose, there exists some truth $p^i \in \{p^1,p^2\}$ such that using $ALG$ we have $\text{diff}_i \geq \Omega(\sqrt{b})\cdot \max(EMD(\hat{p},p),1)$.
+\end{proof}
