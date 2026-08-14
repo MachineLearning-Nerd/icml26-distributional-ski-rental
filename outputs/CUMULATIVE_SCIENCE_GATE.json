@@ -1,0 +1,32 @@
+{
+  "paper": "h8NydU966G",
+  "gate_version": "scoped-v2",
+  "status": "SCOPED_PASS",
+  "strict_status": "SCOPED_PASS",
+  "claims": {
+    "C1": {
+      "status": "VERIFIED_SCOPED",
+      "evidence": "238,140 tail cells and 79,380 exact algorithm cells"
+    },
+    "C2": {
+      "status": "VERIFIED_SCOPED",
+      "evidence": "nine-scale exact hard-family audit"
+    },
+    "C3": {
+      "status": "VERIFIED_SCOPED",
+      "evidence": "truth-invariance and illegal eta-aware mutation controls"
+    }
+  },
+  "controls": {
+    "strict_tail_boundary": true,
+    "truth_independence": true,
+    "eta_aware_mutation_detected": true
+  },
+  "source_anchor_sha256": {
+    "main.tex": "5b5eeec7386bd0f7ffa00c0a34280911ea18438cc6bef09a95edcf54da39d07d",
+    "main_algorithm.tex": "47c36490f628d8028364a8bee3c80862af4ed69ad680b921ddc0f0edafaa7a54",
+    "consistency_robustness.tex": "4df60b9cecc995fc2d639f914809c31bd0b44146300ef1a9551632162ab1822f",
+    "base_algorithm_with_proof.tex": "5a084a4919de80641caf48268e18f6d2a2cc78c2f7ff9742ad2ebdcd1f458a73"
+  },
+  "score_forecast": null
+}

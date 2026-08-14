@@ -1,5 +1,5 @@
 {
-  "space_id": "DineshAI/h8NydU966G",
+  "space_id": null,
   "openreview_id": "h8NydU966G",
   "arxiv_id": "2602.21104",
   "tags": [
@@ -12,7 +12,6 @@
   "local_path_artifacts": [
     {
       "path": "outputs/evidence_bundle.jsonl",
-      "abs_path": "/home/dineshai/Drives/Code/AllCode/ReproduceICML/papers/icml26-repro-h8NydU966G-distributional-ski-rental/outputs/evidence_bundle.jsonl",
       "size": 5387,
       "artifact_type": "dataset"
     }

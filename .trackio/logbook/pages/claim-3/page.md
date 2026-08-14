@@ -1,5 +1,7 @@
 # Claim 3
 
+Status: `VERIFIED_SCOPED`.
+
 
 ---
 <!-- trackio-cell

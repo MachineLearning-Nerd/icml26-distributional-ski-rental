@@ -1,14 +1,33 @@
+#!/usr/bin/env python3
+"""Create a hash-bound manifest for the public reproduction evidence."""
+from __future__ import annotations
+
 import hashlib
 import json
 from pathlib import Path
 
+
 ROOT = Path(__file__).resolve().parents[2]
 FILES = (
-    "README.md", "STATUS.md", "sources.json", "repro/requirements.txt",
-    "repro/src/verify_ski_rental.py", "repro/src/build_evidence_bundle.py",
-    "repro/src/publication_gate.py", "repro/tests/test_verifier.py",
-    "source/arxiv/main_algorithm.tex", "source/arxiv/consistency_robustness.tex",
-    "source/arxiv/base_algorithm_with_proof.tex", "outputs/independent_verification.json",
+    "README.md",
+    "STATUS.md",
+    "sources.json",
+    "repro/requirements.txt",
+    "repro/src/verify_ski_rental.py",
+    "repro/src/build_evidence_bundle.py",
+    "repro/src/cumulative_science_gate.py",
+    "repro/src/publication_gate.py",
+    "repro/tests/test_verifier.py",
+    "source/arxiv/main.tex",
+    "source/arxiv/main_algorithm.tex",
+    "source/arxiv/consistency_robustness.tex",
+    "source/arxiv/base_algorithm_with_proof.tex",
+    "outputs/independent_verification.json",
+    "docs/CLAIM_AUDIT.md",
+    "docs/BRANCH_AUDIT.md",
+    "docs/PUBLICATION_GATE.md",
+    "docs/SOURCE_AUDIT.md",
+    "outputs/README.md",
 )
 
 

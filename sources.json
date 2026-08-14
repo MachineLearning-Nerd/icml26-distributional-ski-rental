@@ -5,6 +5,7 @@
     "arxiv_source_sha256": "f4332df2005da57a5d0dc409e5b321813868878a04d00ad303962dd9755b6864"
   },
   "anchors": {
+    "main.tex": "5b5eeec7386bd0f7ffa00c0a34280911ea18438cc6bef09a95edcf54da39d07d",
     "main_algorithm.tex": "47c36490f628d8028364a8bee3c80862af4ed69ad680b921ddc0f0edafaa7a54",
     "consistency_robustness.tex": "4df60b9cecc995fc2d639f914809c31bd0b44146300ef1a9551632162ab1822f",
     "base_algorithm_with_proof.tex": "5a084a4919de80641caf48268e18f6d2a2cc78c2f7ff9742ad2ebdcd1f458a73"

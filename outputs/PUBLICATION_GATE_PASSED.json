@@ -1,14 +1,7 @@
 {
-  "bundle": {
-    "bytes": 5387,
-    "records": 12,
-    "sha256": "ab5e92785ebf64ef7791c2ec58e11e76985c0d3f014264bb77d16d28cab004be"
-  },
-  "maximum_points": 6,
-  "official_claim_count": 3,
   "paper": "h8NydU966G",
-  "publication_gate_passed": true,
-  "tests": "....                                                                     [100%]\n4 passed in 0.02s",
-  "tests_passed": true,
-  "trackio_space": "DineshAI/h8NydU966G"
+  "status": "HISTORICAL_RETIRED_BASELINE",
+  "historical_publication_gate_passed": true,
+  "reason": "This marker predates the self-contained claim and provenance audit.",
+  "current_gate": "outputs/publication_gate.json"
 }
